@@ -25,9 +25,9 @@ module.exports = {
         },
         {
             "key"          : "port",
-            "name"         : "port for splunk rest service - deafult for splunk is 8089",
+            "name"         : "Splunk API Port - default is 8089",
             "description"  : "",
-            "default"      : "",
+            "default"      : "8089",
             "type"         : "text",
             "user-can-edit" : true,
             "admin-only"    : false
