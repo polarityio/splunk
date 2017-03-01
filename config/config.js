@@ -20,17 +20,17 @@ module.exports = {
             "description"  : "url for splunk instance, please do not include https:// in your url",
             "default"      : "",
             "type"         : "text",
-            "user-can-edit" : true,
-            "admin-only"    : false
+            "userCanEdit" : true,
+            "adminOnly"    : false
         },
         {
             "key"          : "port",
-            "name"         : "Splunk API Port - default is 8089",
+            "name"         : "port for splunk rest service - deafult for splunk is 8089",
             "description"  : "",
-            "default"      : "8089",
+            "default"      : "",
             "type"         : "text",
-            "user-can-edit" : true,
-            "admin-only"    : false
+            "userCanEdit" : true,
+            "adminOnly"    : false
         },
         {
             "key"          : "username",
@@ -38,8 +38,8 @@ module.exports = {
             "description"  : "Splunk Account Username",
             "default"      : "",
             "type"         : "text",
-            "user-can-edit" : true,
-            "admin-only"    : false
+            "userCanEdit" : true,
+            "adminOnly"    : false
         },
         {
             "key"          : "password",
@@ -47,8 +47,8 @@ module.exports = {
             "description"  : "Splunk Account Password",
             "default"      : "",
             "type"         : "password",
-            "user-can-edit" : true,
-            "admin-only"    : false
+            "userCanEdit" : true,
+            "adminOnly"    : false
         },
         {
             "key"          : "searchString",
@@ -56,8 +56,8 @@ module.exports = {
             "description"  : "Search you want to perform in splunk for example: search index=logs ip = {{ENTITY}} | head 10",
             "default"      : "",
             "type"         : "text",
-            "user-can-edit" : true,
-            "admin-only"    : false
+            "userCanEdit" : true,
+            "adminOnly"    : false
         },
         {
             "key"          : "scheme",
@@ -65,8 +65,8 @@ module.exports = {
             "description"  : "scheme for splunk rest service - default for splunk is https",
             "default"      : "",
             "type"         : "text",
-            "user-can-edit" : true,
-            "admin-only"    : false
+            "userCanEdit" : true,
+            "adminOnly"    : false
         },
         {
             "key"          : "version",
@@ -74,8 +74,8 @@ module.exports = {
             "description"  : "Version of Splunk that you are operating",
             "default"      : "",
             "type"         : "text",
-            "user-can-edit" : true,
-            "admin-only"    : false
+            "userCanEdit" : true,
+            "adminOnly"    : false
         },
         {
             "key"          : "uiHostname",
@@ -83,8 +83,18 @@ module.exports = {
             "description"  : "UI Hostname of the Splunk instance you are running",
             "default"      : "",
             "type"         : "text",
-            "user-can-edit" : true,
-            "admin-only"    : false
+            "userCanEdit" : true,
+            "adminOnly"    : false
+        },
+        {
+            "key"          : "autoCancel",
+            "name"         : "Auto Cancel",
+            "description"  : "Number of seconds for a query to run before canceling",
+            "default"      : "20",
+            "type"         : "text",
+            "userCanEdit" : true,
+            "adminOnly"    : false
         }
+
     ]
 };
