@@ -4,57 +4,6 @@ Polarity's Splunk integration allows a user to connect to a Splunk instance. The
 
 The Splunk integration was built with the Splunk Javascript SDK. You can find more information about the SDK here: http://dev.splunk.com/javascript
 
-## Installation of Splunk Integration
-
-You can install an integration either through downloading the file from github, or by using git to clone the repo into your instance.
-
-
-#### Download Zip File
-
-1. Click the `Clone or Download` button
-2. Select `Download Zip`
-3. Upload the zip file to your Polarity-Server
-4. Move the zip file to:
-
- `mv filename /polarity-server/integrations`
-5. Once the file has been moved, navigate to integrations folder:
-
-  `cd /polarity-server/integrations`
-
-6. Extract the zip by running the following command:
-
-    `unzip /splunk`
-
-7. Navigate into the folder that was unzipped
-8. Run the following command to install the integration:
-
-  `npm install --prefix=.`
-
-9. Restart your Polarity-Server
-10. Navigate to Polarity-Web and start the integration
-
-#### GIT Clone
-
-1. Navigate to integrations folder:
-
-  `cd /polarity-server/integrations`
-
-2. Run the following git command:
-
-  `git clone https://github.com/polarityio/integrationname`
-
-3. Switch to the appropriate branch of the integration:
-
-  `git checkout branch name`
-
-4. Run the following command to install the integration:
-
-  `npm install --prefix=.`
-
-5. Restart your Polarity-Server
-6. Navigate to Polarity-Web and start the integration
-
-
 ## Working with Splunk Data
 
 Data in a Splunk instance can vary depending on what is loaded in each index. To get the most out of your Splunk instance, you will want to customize the data returned from each index that you have.
@@ -182,3 +131,100 @@ This the exact hostname that you go to, in order to access the Splunk User-Inter
 This is an execution setting, that allows a user or admin to set a time limit to cancel a long running query. Time is in seconds.
 
   `Example: 20`
+
+
+
+## Installation Instructions
+
+1. Navigate to the [polarityio/splunk releases page](https://github.com/polarityio/splunk/releases).
+2. Download the `tar.gz` file for the version of the integration you want to install (we typically recommend installing the latest version of the integration).
+3. Upload the `tar.gz` file to your Polarity Server.
+4. Move the `tar.gz` file to the Polarity Server integrations directory.
+
+ ```bash
+ mv <filename> /app/polarity-server/integrations
+ ```
+
+5. Once the file has been moved, navigate to the integrations folder:
+
+ ```bash
+ cd /app/polarity-server/integrations
+ ```
+  
+6. Extract the tar file:
+
+ ```bash
+ tar -xzvf <filename>
+ ```
+
+6. Navigate into the extracted folder for the new integration:
+
+ ```bash
+cd <filename>
+```
+
+7. Install the integration's dependencies:
+
+ ```bash
+npm install
+```
+
+8. Ensure the integration directory is owned by the `polarityd` user
+ 
+ ```bash
+chown -R polarityd:polarityd /app/polarity-server/integrations/splunk
+```
+
+9. Restart your Polarity-Server
+
+ ```bash
+service polarityd restart
+```
+
+10. Navigate to the integrations page in Polarity-Web to configure the integration.
+
+### Installing via GIT Clone
+
+1. Navigate to the integrations folder:
+
+ ```bash
+cd /app/polarity-server/integrations
+```
+
+2. Clone a specific version of the splunk repo using git:
+
+ ```bash
+git clone --branch <version> https://github.com/polarityio/splunk.git
+```
+
+3. Change into the integration directory
+
+ ```bash
+cd splunk
+```
+
+4. Use `npm` to install the integration's dependencies
+
+ ```bash
+npm install
+```
+
+5.  Ensure the integration directory is owned by the `polarityd` user
+
+ ```bash
+chown -R polarityd:polarityd /app/polarity-server/integrations/splunk
+```
+
+6. Restart your Polarity-Server
+
+ ```bash
+service polarityd restart
+```
+
+7. Navigate to the integrations page in Polarity-Web to configure the integration
+
+## Polarity
+
+Polarity is a memory-augmentation platform that improves and accelerates analyst decision making.  For more information about the Polarity platform please see: 
+
+https://polarity.io/

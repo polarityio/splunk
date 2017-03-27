@@ -1,59 +1,10 @@
 # Polarity Splunk Integration
 
+** This integration is still in development **
+
 Polarity's Splunk integration allows a user to connect to a Splunk instance. The integration returns the number of records that are present for a given entity.
 
 The Splunk integration was built with the Splunk Javascript SDK. You can find more information about the SDK here: http://dev.splunk.com/javascript
-
-## Installation of Splunk Integration
-
-You can install an integration either through downloading the file from github, or by using git to clone the repo into your instance.
-
-
-#### Download Zip File
-
-1. Click the `Clone or Download` button
-2. Select `Download Zip`
-3. Upload the zip file to your Polarity-Server
-4. Move the zip file to:
-
- `mv filename /polarity-server/integrations`
-5. Once the file has been moved, navigate to integrations folder:
-
-  `cd /polarity-server/integrations`
-
-6. Extract the zip by running the following command:
-
-    `unzip /splunk`
-
-7. Navigate into the folder that was unzipped
-8. Run the following command to install the integration:
-
-  `npm install --prefix=.`
-
-9. Restart your Polarity-Server
-10. Navigate to Polarity-Web and start the integration
-
-#### GIT Clone
-
-1. Navigate to integrations folder:
-
-  `cd /polarity-server/integrations`
-
-2. Run the following git command:
-
-  `git clone https://github.com/polarityio/integrationname`
-
-3. Switch to the appropriate branch of the integration:
-
-  `git checkout branch name`
-
-4. Run the following command to install the integration:
-
-  `npm install --prefix=.`
-
-5. Restart your Polarity-Server
-6. Navigate to Polarity-Web and start the integration
-
 
 ## Working with Splunk Data
 
@@ -182,3 +133,13 @@ This the exact hostname that you go to, in order to access the Splunk User-Inter
 This is an execution setting, that allows a user or admin to set a time limit to cancel a long running query. Time is in seconds.
 
   `Example: 20`
+
+## Installation Instructions
+
+Installation instructions for integrations are provided on the [PolarityIO GitHub Page](https://polarityio.github.io/).
+
+## Polarity
+
+Polarity is a memory-augmentation platform that improves and accelerates analyst decision making.  For more information about the Polarity platform please see: 
+
+https://polarity.io/
