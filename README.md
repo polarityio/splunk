@@ -1,6 +1,6 @@
 # Polarity Splunk Integration
 
-** This integration is still in development **
+**This integration is still in development**
 
 Polarity's Splunk integration allows a user to connect to a Splunk instance. The integration returns the number of records that are present for a given entity.
 
