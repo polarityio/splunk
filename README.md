@@ -6,33 +6,29 @@ Polarity's Splunk integration allows a user to connect to a Splunk instance. The
 
 The Splunk integration was built with the Splunk Javascript SDK. You can find more information about the SDK here: http://dev.splunk.com/javascript
 
-## Splunk Settings
+## Splunk Integration Options
 
-There are a few main settings in the Splunk Integration
+### Hostname
 
-#### Hostname
+This setting is the hostname of your Splunk instance. Please do not include the Scheme or Port if there is one. For example:
 
-This setting is the hostname of your Splunk instance. Please do not include the Scheme or Port if there is one.
+```
+www.splunkinstance.com
+```
 
-  `Example: www.splunkinstance.com`
-
-#### Port
+### Port
 
 The default for port for the Splunk RestAPI is 8089. If you have changed your port when setting up your Splunk instance, please change the RestAPI port here.
 
-  `Example: 8089`
+### Username
 
-#### Username
+Username set for an individual user or if you have a generic RestAPI user, you can set it here. 
 
-Username set for an individual user or if you have a generic RestAPI user, you can set it here.
-
-  `Example: admin`
-
-#### Password
+### Password
 
 Password set for the individual user or generic user.
 
-#### Search String
+### Search String
 
 This is the search that you want executed within Splunk. Please ensure that your search starts with "search" and contains the variable `{{ENTITY}}` in order for the search to be executed properly.  The variable represented by the string `{{ENTITY}}` will be replaced by the actual entity (i.e., an IP, hash, or email) that Polarity recognized on the user's screen.
 
@@ -42,15 +38,15 @@ For example, to search the `mainIndex` you might use a query like this:
 search index=mainIndex {{ENTITY}}
 ```
     
-#### Scheme
+### Scheme
 
 Scheme set for your Splunk RestAPI. Valid values are `https` and `http`.  The default value is set to `https`.
   
-#### Version
+### Version
 
 Version of the Splunk instance that you are running.  For example, `6.5`.
 
-#### UI Hostname
+### UI Hostname
 
 This the exact hostname that you go to in order to access the Splunk User-Interface. If there is a port or a protocal used, please ensure they are included.  For example:
 
@@ -58,7 +54,7 @@ This the exact hostname that you go to in order to access the Splunk User-Interf
 https://www.splunkinstance.com:8000
 ```
 
-#### Auto Cancel
+### Auto Cancel
 
 This is an execution setting, that allows a user or admin to set a time limit to cancel a long running query. The value is specified in whole seconds.
   
