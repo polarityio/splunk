@@ -2,13 +2,12 @@
   "main": "./integrations.js",
   "name": "Splunk",
   "description": "Splunk Query Engine",
-  "version": "0.0.2",
+  "version": "1.0.0-beta",
   "private": true,
   "dependencies": {
     "request": "^2.75",
     "lodash": "^4.16",
     "async": "^2.0",
-    "splunk-sdk": "^1.8.0",
-    "csv-parse": "^1.1.7"
+    "splunk-sdk": "^1.8.0"
   }
 }

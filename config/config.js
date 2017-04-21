@@ -2,6 +2,7 @@ module.exports = {
     "name": "Splunk",
     "acronym":"Splunk",
     "logging": { level: 'debug'},
+    "entityTypes": ['IPv4', 'IPv6', 'hash', 'email'],
     "styles": [
      "./styles/splunk.less"
      ],
@@ -27,7 +28,7 @@ module.exports = {
             "key"          : "port",
             "name"         : "port for splunk rest service - deafult for splunk is 8089",
             "description"  : "",
-            "default"      : "",
+            "default"      : "8089",
             "type"         : "text",
             "userCanEdit" : true,
             "adminOnly"    : false
@@ -51,8 +52,8 @@ module.exports = {
             "adminOnly"    : false
         },
         {
-            "key"          : "searchString",
-            "name"         : "Search String",
+            "key"          : "searchStringIP",
+            "name"         : "Search String for IPs",
             "description"  : "Search you want to perform in splunk for example: search index=logs ip = {{ENTITY}} | head 10",
             "default"      : "",
             "type"         : "text",
@@ -63,7 +64,7 @@ module.exports = {
             "key"          : "scheme",
             "name"         : "Scheme",
             "description"  : "scheme for splunk rest service - default for splunk is https",
-            "default"      : "",
+            "default"      : "https",
             "type"         : "text",
             "userCanEdit" : true,
             "adminOnly"    : false
