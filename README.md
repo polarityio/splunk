@@ -2,6 +2,8 @@
 
 Polarity's Splunk integration allows a user to connect to a Splunk instance. The integration returns the number of records for an IP that are present for a given entity. A user can also link out to the splunk instance to view the data in Splunk.
 
+![image](https://cloud.githubusercontent.com/assets/22529325/25285364/efae003e-2687-11e7-9364-ab524de3f967.png)
+
 The Splunk integration was built with the Splunk Javascript SDK. You can find more information about the SDK here: http://dev.splunk.com/javascript
 
 ## Splunk Integration Options
