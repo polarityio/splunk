@@ -8,6 +8,12 @@
     "request": "^2.75",
     "lodash": "^4.16",
     "async": "^2.0",
-    "splunk-sdk": "^1.8.0"
-  }
+    "splunk-sdk": "^1.8.0",
+    "snyk": "^1.189.0"
+  },
+  "scripts": {
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
