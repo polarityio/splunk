@@ -23,7 +23,7 @@ module.exports = {
    * @optional
    */
   description:
-    'Splunk Enteprise is the fastest way to aggregate, analyze and get answers from your machine data with the help machine learning and real-time visibility.',
+    'Splunk Enteprise allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
   entityTypes: ['IPv4', 'IPv6', 'hash', 'email'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
@@ -101,7 +101,7 @@ module.exports = {
       key: 'searchAppUrl',
       name: 'Splunk Search App URL',
       description:
-        'The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view and edit" or "User can view only".',
+        'The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
       type: 'text',
       default: '',
       userCanEdit: false,
@@ -109,12 +109,12 @@ module.exports = {
     },
     {
       key: 'apiToken',
-      name: 'Valid Splunk Token',
-      description: 'Valid Splunk Authentication Token',
+      name: 'Splunk Authentication Token',
+      description: 'A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".',
       default: '',
       type: 'password',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'searchString',
@@ -123,8 +123,8 @@ module.exports = {
         'Splunk Search String to execute. The string `{{ENTITY}}` will be replace by the looked up indicator. For example: search index=logs value={{ENTITY}} | head 10',
       default: '',
       type: 'text',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
 
     {
