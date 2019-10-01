@@ -16,14 +16,14 @@ REST API will be different than the Splunk Web UI which defaults to port 9000.
 Example REST API Url:
 
 ```
-https://splunk..dev:8089
+https://splunk.dev:8089
 ```
 
-> The default for port for the Splunk RestAPI is 8089 but may have been changed by your Splunk administrator.
+> The default port for the Splunk REST API is 8089.
 
 ### Splunk Search App URL
 
-The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").  This setting is used to make a clickable link the Overlay Window that will take you to the Splunk search interface.
+The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").  This setting is used to make a clickable link in the Overlay Window that will take you to the Splunk search interface.
 
 > It is important that this setting is set to "User can view only".  This is required so the option is available to non-admin users in their Overlay Window.
 
@@ -43,15 +43,15 @@ search index=mainIndex indicator="{{ENTITY}}"
 
 #### Limit Searches by Time
 
-As a general rule of thumb you should try to narrow down the search scope as quickly as possible going left to right. A great way to limit the search scope is limit the timeframe of data you are searching.  For example, to only search the last 90 days of data you could use the following:
+As a general rule of thumb you should try to narrow down the search scope. A great way to limit the search scope is limit the time frame of data you are searching.  For example, to only search the last 90 days of data you could use the following:
 
 ```
-search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d
+search source="malicious-indicators" sourcetype="csv" earliest=-90d value="{{entity}}" 
 ```
 
 #### Limit Searches by Records
 
-If your search can return more than 1 result you should always limit your query so that at most it returns 10 results.  This can be done using the `head` parameter like this:
+If your search can return more than 1 result you should always limit your query to only return a small number of events.  This can be done using the `head` parameter:
 
 ```
 search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | head 10
@@ -61,19 +61,19 @@ The above search will search the `malicious-indicators` source and return events
 
 #### Limit the Amount of Return Data
 
-It is also important to limit how much data your search returns.  You can specify specific fields to include using the `fields` parameter.  For example, if you only want to return the `score, status, value fields you could use the following query:
+It is also important to limit how much data your search returns.  You can specify specific fields to include using the `fields` parameter.  For example, if you only want to return the `score`, `status`, and `value` fields you could use the following query:
 
 ```
-search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | fields score, status, value | head 10
+search source="malicious-indicators" sourcetype="csv" earliest=-90d value="{{entity}}" | fields score, status, value | head 10
 ```
 
-In addition to specifying which fields to return you can also tell Splunk not to return certain fields.  In particular, you can cut down on the amount of data return by telling Splunk not to return the `_raw` field which is the entire raw event record as a string.  To tell Splunk not to return specific fields you add the `-` (minus sign), in front of the field names you do not want to return.  By default, Splunk will return the `_raw` field so it is a good idea to specifically remove it.
+In addition to specifying which fields to return you can also tell Splunk not to return certain fields.  In particular, you can cut down on the amount of data returned by telling Splunk not to return the `_raw` field which is the entire raw event record as a string.  To tell Splunk not to return specific fields you add the `-` (minus sign), in front of the field names you do not want to return.  By default, Splunk will return the `_raw` field so it is a good idea to specifically remove it.
 
 ```
-search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | fields score, status, value | fields - _raw | head 10
+search source="malicious-indicators" sourcetype="csv" earliest=-90d value="{{entity}}" | fields score, status, value | fields - _raw | head 10
 ```  
 
-There are other internal Splunk fields which all being with an underscore (`_`).  You can remove all the internal fields from being returned by using the wildcard syntax which is an asterisk (`_*`).
+There are other internal Splunk fields which all begin with an underscore (`_`).  You can remove all the internal fields from being returned by using the wildcard syntax which is an asterisk (`_*`).
 
 ```
 search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | fields score, status, value | fields - _* | head 10
