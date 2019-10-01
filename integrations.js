@@ -221,6 +221,26 @@ function validateOptions(userOptions, cb) {
     });
   }
 
+  if (typeof userOptions.summaryFields.value === 'string' && /\s/.test(userOptions.summaryFields.value)) {
+    errors.push({
+      key: 'summaryFields',
+      message: 'Summary Fields should not include spaces.'
+    });
+  }
+
+  if (
+    typeof userOptions.searchString.value === 'string' &&
+    !userOptions.searchString.value
+      .trim()
+      .toLowerCase()
+      .startsWith('search')
+  ) {
+    errors.push({
+      key: 'searchString',
+      message: 'Splunk Search String must start with the string `search`'
+    });
+  }
+
   cb(null, errors);
 }
 
