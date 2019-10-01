@@ -1,64 +1,103 @@
-# Polarity Splunk Integration
+# Polarity Splunk Enterprise Integration
 
-Polarity's Splunk integration allows a user to connect to a Splunk instance. The integration returns the number of records for an IP that are present for a given entity. A user can also link out to the splunk instance to view the data in Splunk.
+Polarity's Splunk integration allows a user to connect and search a Splunk instance. 
 
-![image](https://cloud.githubusercontent.com/assets/22529325/25285364/efae003e-2687-11e7-9364-ab524de3f967.png)
+![image](images/overlay.png)
 
 The Splunk integration was built with the Splunk Javascript SDK. You can find more information about the SDK here: http://dev.splunk.com/javascript
 
-## Splunk Integration Options
+## Splunk Enterprise Integration Options
 
-### Hostname
+### Base Splunk Enterprise URL
 
-This setting is the hostname of your Splunk instance. Please do not include the Scheme or Port if there is one. For example:
+The base URL for the Splunk Enterprise REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089).  The URL for the Splunk
+REST API will be different than the Splunk Web UI which defaults to port 9000.
+
+Example REST API Url:
 
 ```
-www.splunkinstance.com
+https://splunk..dev:8089
 ```
 
-### Port
+> The default for port for the Splunk RestAPI is 8089 but may have been changed by your Splunk administrator.
 
-The default for port for the Splunk RestAPI is 8089. If you have changed your port when setting up your Splunk instance, please change the RestAPI port here.
+### Splunk Search App URL
 
-### Username
+The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").  This setting is used to make a clickable link the Overlay Window that will take you to the Splunk search interface.
 
-Username set for an individual user or if you have a generic RestAPI user, you can set it here. 
+> It is important that this setting is set to "User can view only".  This is required so the option is available to non-admin users in their Overlay Window.
 
-### Password
+### Splunk Authentication Token
 
-Password set for the individual user or generic user.
+A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens". 
 
-### Search String
+### Splunk Search String
 
 This is the search that you want executed within Splunk. Please ensure that your search starts with "search" and contains the variable `{{ENTITY}}` in order for the search to be executed properly.  The variable represented by the string `{{ENTITY}}` will be replaced by the actual entity (i.e., an IP, hash, or email) that Polarity recognized on the user's screen.
 
 For example, to search the `mainIndex` you might use a query like this:
 
 ```
-search index=mainIndex {{ENTITY}}
-```
-    
-### Scheme
-
-Scheme set for your Splunk RestAPI. Valid values are `https` and `http`.  The default value is set to `https`.
-  
-### Version
-
-Version of the Splunk instance that you are running.  For example, `6.5`.
-
-### UI Hostname
-
-This the exact hostname that you go to in order to access the Splunk User-Interface. If there is a port or a protocal used, please ensure they are included.  For example:
-
-```
-https://www.splunkinstance.com:8000
+search index=mainIndex indicator="{{ENTITY}}"
 ```
 
-### Auto Cancel
+#### Limit Searches by Time
 
-This is an execution setting, that allows a user or admin to set a time limit to cancel a long running query. The value is specified in whole seconds.
-  
-## Installation Instructions
+As a general rule of thumb you should try to narrow down the search scope as quickly as possible going left to right. A great way to limit the search scope is limit the timeframe of data you are searching.  For example, to only search the last 90 days of data you could use the following:
+
+```
+search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d
+```
+
+#### Limit Searches by Records
+
+If your search can return more than 1 result you should always limit your query so that at most it returns 10 results.  This can be done using the `head` parameter like this:
+
+```
+search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | head 10
+```
+
+The above search will search the `malicious-indicators` source and return events where the `value` field equals the `{{ENTITY}}` being looked up.  The search will only search the last 90 days of data and will only return the first 10 results.
+
+#### Limit the Amount of Return Data
+
+It is also important to limit how much data your search returns.  You can specify specific fields to include using the `fields` parameter.  For example, if you only want to return the `score, status, value fields you could use the following query:
+
+```
+search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | fields score, status, value | head 10
+```
+
+In addition to specifying which fields to return you can also tell Splunk not to return certain fields.  In particular, you can cut down on the amount of data return by telling Splunk not to return the `_raw` field which is the entire raw event record as a string.  To tell Splunk not to return specific fields you add the `-` (minus sign), in front of the field names you do not want to return.  By default, Splunk will return the `_raw` field so it is a good idea to specifically remove it.
+
+```
+search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | fields score, status, value | fields - _raw | head 10
+```  
+
+There are other internal Splunk fields which all being with an underscore (`_`).  You can remove all the internal fields from being returned by using the wildcard syntax which is an asterisk (`_*`).
+
+```
+search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | fields score, status, value | fields - _* | head 10
+```
+
+### Summary Fields
+
+Comma delimited list of field values to include as part of the summary (no spaces between commas). These fields must be returned by your search query. This option must be set to "User can view and edit" or "User can view only".
+
+ > It is important that this setting is set to "User can view only" or "User can view and edit".  This is required so the option is available to non-admin users in their Overlay Window.
+ 
+ As an example, if our query is as follows:
+ 
+ ```
+ search source="malicious-indicators" sourcetype="csv" value="{{entity}}" earliest=-90d | fields score, status, value | fields - _* | head 10
+ ```
+ 
+ We could show just the score and status in the summary view by setting the "Summary Fields" option to:
+ 
+ ```
+ score,status
+ ```
+ 
+ ## Installation Instructions
 
 Installation instructions for integrations are provided on the [PolarityIO GitHub Page](https://polarityio.github.io/).
 
