@@ -6,6 +6,12 @@ Polarity's Splunk integration allows a user to connect and search a Splunk insta
 
 The Splunk integration was built with the Splunk Javascript SDK. You can find more information about the SDK here: http://dev.splunk.com/javascript
 
+## Required: Enabling Token Authentication
+
+The Polarity-Splunk integration requires that Token Authentication be enabled on your Splunk instance.  By default, token authentication is turned off for new installations of Splunk Enterprise. For directions on how to enable Token Authentication please see the following Splunk help page.
+
+> https://docs.splunk.com/Documentation/Splunk/7.3.1/Security/EnableTokenAuth 
+
 ## Splunk Enterprise Integration Options
 
 ### Base Splunk Enterprise URL
