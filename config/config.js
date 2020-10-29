@@ -88,6 +88,15 @@ module.exports = {
    */
   options: [
     {
+      key: 'isCloud',
+      name: 'Splunk Cloud Deployment',
+      description: 'If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment.',
+      default: false,
+      type: 'boolean',
+      userCanEdit: true,
+      adminOnly: false
+    },
+    {
       key: 'url',
       name: 'Base Splunk Enterprise URL',
       description:
@@ -108,9 +117,29 @@ module.exports = {
       adminOnly: true
     },
     {
+      key: 'username',
+      name: 'Splunk Cloud Username',
+      description:
+        'Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.',
+      type: 'text',
+      default: '',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
+      key: 'password',
+      name: 'Splunk Cloud Password',
+      description:
+        'Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.',
+      type: 'password',
+      default: '',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
       key: 'apiToken',
       name: 'Splunk Authentication Token',
-      description: 'A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".',
+      description: 'A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".  If authenticating against a Splunk Cloud deployment, please leave this field blank.',
       default: '',
       type: 'password',
       userCanEdit: false,

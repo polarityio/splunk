@@ -58,15 +58,19 @@ function doLookup(entities, options, cb) {
     let requestOptions = {
       method: 'GET',
       uri: `${options.url}/services/search/jobs/export`,
-      headers: {
-        Authorization: 'Bearer ' + options.apiToken
-      },
       qs: {
         output_mode: 'json',
         search: options.searchString.replace(/{{ENTITY}}/gi, entity.value)
       },
       json: false
     };
+
+    if (options.isCloud) {
+      requestOptions.auth = { username: options.username, password: options.password }
+    } else {
+      requestOptions.headers = { Authorization: 'Bearer ' + options.apiToken }
+      return;
+    }
 
     Logger.trace({ requestOptions }, 'Request URI');
 
