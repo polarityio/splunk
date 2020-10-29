@@ -14,6 +14,10 @@ The Polarity-Splunk integration requires that Token Authentication be enabled on
 
 ## Splunk Enterprise Integration Options
 
+### Splunk Cloud Deployment
+
+If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment.
+
 ### Base Splunk Enterprise URL
 
 The base URL for the Splunk Enterprise REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089).  The URL for the Splunk
@@ -32,6 +36,16 @@ https://splunk.dev:8089
 The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").  This setting is used to make a clickable link in the Overlay Window that will take you to the Splunk search interface.
 
 > It is important that this setting is set to "User can view only".  This is required so the option is available to non-admin users in their Overlay Window.
+
+
+### Splunk Cloud Username
+
+Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.
+
+### Splunk Cloud Password
+
+Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.
+
 
 ### Splunk Authentication Token
 
