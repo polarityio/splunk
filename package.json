@@ -5,7 +5,8 @@
   "version": "3.1.0-beta",
   "private": true,
   "dependencies": {
-    "request": "^2.88",
-    "async": "^3.1"
+    "async": "^3.1",
+    "node-cache": "^5.1.2",
+    "request": "^2.88"
   }
 }
