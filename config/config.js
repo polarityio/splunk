@@ -90,11 +90,12 @@ module.exports = {
     {
       key: 'isCloud',
       name: 'Splunk Cloud Deployment',
-      description: 'If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment.',
+      description:
+        'If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment. (Please set this to admin only and user can view only.)',
       default: false,
       type: 'boolean',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'url',
@@ -139,7 +140,8 @@ module.exports = {
     {
       key: 'apiToken',
       name: 'Splunk Authentication Token',
-      description: 'A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".  If authenticating against a Splunk Cloud deployment, please leave this field blank.',
+      description:
+        'A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".  If authenticating against a Splunk Cloud deployment, please leave this field blank.',
       default: '',
       type: 'password',
       userCanEdit: false,
@@ -169,7 +171,8 @@ module.exports = {
     {
       key: 'includeFieldNameInSummary',
       name: 'Include Field Name in Summary',
-      description: 'If checked, field names will be included as part of the summary fields. This option must be set to "User can view and edit" or "User can view only".',
+      description:
+        'If checked, field names will be included as part of the summary fields. This option must be set to "User can view and edit" or "User can view only".',
       default: true,
       type: 'boolean',
       userCanEdit: true,

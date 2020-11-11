@@ -230,7 +230,7 @@ const addAuthHeaders = (requestOptions, options, callback) => {
       (error, res, body) => {
         const sessionKey = body && body[0] === '{' && JSON.parse(body).sessionKey;
         if (error || !sessionKey) return callback({ error, body, detail: 'Failed to get auth token for Splunk Cloud' });
-
+        
         tokenCache.set(`${options.username}${options.password}`, sessionKey);
         requestOptions.headers = { Authorization: 'Splunk ' + sessionKey };
         callback(null, requestOptions);
@@ -253,11 +253,40 @@ function validateOptions(userOptions, cb) {
       message: 'You must provide a valid Splunk URL'
     });
   }
-
+  
   if (typeof userOptions.url.value === 'string' && userOptions.url.value.endsWith('/')) {
     errors.push({
       key: 'url',
       message: 'The Splunk URL should not end with a forward slash ("/")'
+    });
+  }
+  if (typeof userOptions.isCloud.value === 'boolean' && userOptions.isCloud.value) {
+    if (!userOptions.username.value || !userOptions.password.value) {
+      errors.push({
+        key: 'isCloud',
+        message: 'If Checked, you are also required to enter both a Splunk Cloud Username and a Splunk Cloud Password.'
+      });
+      if (!userOptions.username.value) {
+        errors.push({
+          key: 'username',
+          message: 'You must provide your Splunk Cloud Username'
+        });
+      }
+      if (!userOptions.password.value) {
+        errors.push({
+          key: 'password',
+          message: 'You must provide your Splunk Cloud Password'
+        });
+      }
+    }
+  } else if (!typeof userOptions.apiToken.value === 'string' || !userOptions.apiToken.value){
+    errors.push({
+      key: 'isCloud',
+      message: 'If Not Checked, you are also required to enter a Splunk Authentication Token.'
+    });
+    errors.push({
+      key: 'apiToken',
+      message: 'You must provide a valid Splunk Authentication Token'
     });
   }
 

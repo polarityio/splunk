@@ -16,7 +16,7 @@ The Polarity-Splunk integration requires that Token Authentication be enabled on
 
 ### Splunk Cloud Deployment
 
-If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment.
+If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment. (Please set this to admin only and user can view only.)
 
 ### Base Splunk Enterprise URL
 
