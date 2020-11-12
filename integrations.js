@@ -4,6 +4,11 @@ const request = require('request');
 const config = require('./config/config');
 const async = require('async');
 const fs = require('fs');
+const NodeCache = require('node-cache');
+
+const tokenCache = new NodeCache({
+  stdTTL: 5 * 60
+});
 
 let Logger;
 let requestWithDefaults;
@@ -58,9 +63,6 @@ function doLookup(entities, options, cb) {
     let requestOptions = {
       method: 'GET',
       uri: `${options.url}/services/search/jobs/export`,
-      headers: {
-        Authorization: 'Bearer ' + options.apiToken
-      },
       qs: {
         output_mode: 'json',
         search: options.searchString.replace(/{{ENTITY}}/gi, entity.value)
@@ -68,40 +70,47 @@ function doLookup(entities, options, cb) {
       json: false
     };
 
-    Logger.trace({ requestOptions }, 'Request URI');
-
-    tasks.push(function(done) {
-      requestWithDefaults(requestOptions, function(error, res, body) {
+    tasks.push(function (done) {
+      addAuthHeaders(requestOptions, options, (error, requestOptionsWithAuth) => {
         if (error) {
           return done({
             error,
-            detail: 'Error Executing HTTP Request to Splunk REST API'
+            detail: 'Error Getting Auth Token'
           });
         }
 
-        let result = {};
+        requestWithDefaults(requestOptionsWithAuth, function (error, res, body) {
+          if (error) {
+            return done({
+              error,
+              detail: 'Error Executing HTTP Request to Splunk REST API'
+            });
+          }
 
-        if (res.statusCode === 200) {
-          result = {
-            entity: entity,
-            body: body,
-            search: requestOptions.qs.search
-          };
-        } else if (res.statusCode === 404) {
-          // no result found
-          result = {
-            entity: entity,
-            body: null
-          };
-        } else {
-          // unexpected status code
-          return done({
-            err: body,
-            detail: _formatErrorMessages(body)
-          });
-        }
+          let result = {};
 
-        done(null, result);
+          if (res.statusCode === 200) {
+            result = {
+              entity: entity,
+              body: body,
+              search: requestOptionsWithAuth.qs.search
+            };
+          } else if (res.statusCode === 404) {
+            // no result found
+            result = {
+              entity: entity,
+              body: null
+            };
+          } else {
+            // unexpected status code
+            return done({
+              err: body,
+              detail: _formatErrorMessages(body)
+            });
+          }
+
+          done(null, result);
+        });
       });
     });
   });
@@ -202,6 +211,37 @@ function _formatErrorMessages(err) {
   return formattedMessage;
 }
 
+const addAuthHeaders = (requestOptions, options, callback) => {
+  if (options.isCloud) {
+    const cachedToken = tokenCache.get(`${options.username}${options.password}`);
+    if (cachedToken) 
+      return callback(null, { ...requestOptions, headers: { Authorization: 'Splunk ' + cachedToken } });
+
+    requestWithDefaults(
+      {
+        url: `${options.url}/services/auth/login?output_mode=json`,
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'text/plain'
+        },
+        body: `username=${options.username}&password=${options.password}`
+      },
+      (error, res, body) => {
+        const sessionKey = body && body[0] === '{' && JSON.parse(body).sessionKey;
+        if (error || !sessionKey) return callback({ error, body, detail: 'Failed to get auth token for Splunk Cloud' });
+        
+        tokenCache.set(`${options.username}${options.password}`, sessionKey);
+        requestOptions.headers = { Authorization: 'Splunk ' + sessionKey };
+        callback(null, requestOptions);
+      }
+    );
+  } else {
+    requestOptions.headers = { Authorization: 'Bearer ' + options.apiToken };
+    callback(null, requestOptions);
+  }
+};
+
 function validateOptions(userOptions, cb) {
   let errors = [];
   if (
@@ -213,11 +253,40 @@ function validateOptions(userOptions, cb) {
       message: 'You must provide a valid Splunk URL'
     });
   }
-
+  
   if (typeof userOptions.url.value === 'string' && userOptions.url.value.endsWith('/')) {
     errors.push({
       key: 'url',
       message: 'The Splunk URL should not end with a forward slash ("/")'
+    });
+  }
+  if (typeof userOptions.isCloud.value === 'boolean' && userOptions.isCloud.value) {
+    if (!userOptions.username.value || !userOptions.password.value) {
+      errors.push({
+        key: 'isCloud',
+        message: 'If Checked, you are also required to enter both a Splunk Cloud Username and a Splunk Cloud Password.'
+      });
+      if (!userOptions.username.value) {
+        errors.push({
+          key: 'username',
+          message: 'You must provide your Splunk Cloud Username'
+        });
+      }
+      if (!userOptions.password.value) {
+        errors.push({
+          key: 'password',
+          message: 'You must provide your Splunk Cloud Password'
+        });
+      }
+    }
+  } else if (!typeof userOptions.apiToken.value === 'string' || !userOptions.apiToken.value){
+    errors.push({
+      key: 'isCloud',
+      message: 'If Not Checked, you are also required to enter a Splunk Authentication Token.'
+    });
+    errors.push({
+      key: 'apiToken',
+      message: 'You must provide a valid Splunk Authentication Token'
     });
   }
 

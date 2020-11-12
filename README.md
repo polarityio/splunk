@@ -1,4 +1,4 @@
-# Polarity Splunk Enterprise Integration
+# Polarity Splunk Integration
 
 Polarity's Splunk integration allows a user to connect and search a Splunk instance. 
 
@@ -8,15 +8,23 @@ The Splunk integration was built with the Splunk Javascript SDK. You can find mo
 
 ## Required: Enabling Token Authentication
 
-The Polarity-Splunk integration requires that Token Authentication be enabled on your Splunk instance.  By default, token authentication is turned off for new installations of Splunk Enterprise. For directions on how to enable Token Authentication please see the following Splunk help page.
+The Polarity-Splunk integration requires that Token Authentication be enabled on your Splunk Enterprise instance.  By default, token authentication is turned off for new installations of Splunk Enterprise. For directions on how to enable Token Authentication please see the following Splunk help page.
 
 > https://docs.splunk.com/Documentation/Splunk/7.3.1/Security/EnableTokenAuth 
 
-## Splunk Enterprise Integration Options
+To use your Splunk Cloud deployment you must submit a case requesting access using the [Splunk Support Portal](https://login.splunk.com/en_us/?module=roles&func=showloginform&redirecturl=https%3A%2F%2Fwww.splunk.com%2Fpage%2Fsso_redirect%3Ftype%3Dportal%26resume%3D%2Fidp%2Fs3HZp%2FresumeSAML20%2Fidp%2FSSO.ping%26spentity%3Dhttps%3A%2F%2FPROD_SupportPortal_ExistingContact). 
 
-### Base Splunk Enterprise URL
+> https://docs.splunk.com/Documentation/Splunk/8.0.6/RESTTUT/RESTandCloud
 
-The base URL for the Splunk Enterprise REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089).  The URL for the Splunk
+## Splunk Integration Options
+
+### Splunk Cloud Deployment
+
+If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment. (Please set this to admin only and user can view only.)
+
+### Base Splunk URL
+
+The base URL for the Splunk REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089).  The URL for the Splunk
 REST API will be different than the Splunk Web UI which defaults to port 9000.
 
 Example REST API Url:
@@ -29,9 +37,19 @@ https://splunk.dev:8089
 
 ### Splunk Search App URL
 
-The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").  This setting is used to make a clickable link in the Overlay Window that will take you to the Splunk search interface.
+The URL for the Splunk Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").  This setting is used to make a clickable link in the Overlay Window that will take you to the Splunk search interface.
 
 > It is important that this setting is set to "User can view only".  This is required so the option is available to non-admin users in their Overlay Window.
+
+
+### Splunk Cloud Username
+
+Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.
+
+### Splunk Cloud Password
+
+Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.
+
 
 ### Splunk Authentication Token
 

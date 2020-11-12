@@ -5,7 +5,7 @@ module.exports = {
    * @type String
    * @required
    */
-  name: 'Splunk Enterprise',
+  name: 'Splunk',
   /**
    * The acronym that appears in the notification window when information from this integration
    * is displayed.  Note that the acronym is included as part of each "tag" in the summary information
@@ -15,7 +15,7 @@ module.exports = {
    * @type String
    * @required
    */
-  acronym: 'SE',
+  acronym: 'SPLNK',
   /**
    * Description for this integration which is displayed in the Polarity integrations user interface
    *
@@ -23,7 +23,7 @@ module.exports = {
    * @optional
    */
   description:
-    'Splunk Enteprise allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
+    'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
   entityTypes: ['IPv4', 'IPv6', 'hash', 'email'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
@@ -88,10 +88,20 @@ module.exports = {
    */
   options: [
     {
-      key: 'url',
-      name: 'Base Splunk Enterprise URL',
+      key: 'isCloud',
+      name: 'Splunk Cloud Deployment',
       description:
-        'The base URL for the Splunk Enterprise REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089)',
+        'If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment. (Please set this to admin only and user can view only.)',
+      default: false,
+      type: 'boolean',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
+      key: 'url',
+      name: 'Base Splunk URL',
+      description:
+        'The base URL for the Splunk REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089)',
       type: 'text',
       default: '',
       userCanEdit: false,
@@ -101,8 +111,28 @@ module.exports = {
       key: 'searchAppUrl',
       name: 'Splunk Search App URL',
       description:
-        'The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
+        'The URL for the Splunk Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
       type: 'text',
+      default: '',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
+      key: 'username',
+      name: 'Splunk Cloud Username',
+      description:
+        'Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.',
+      type: 'text',
+      default: '',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
+      key: 'password',
+      name: 'Splunk Cloud Password',
+      description:
+        'Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.',
+      type: 'password',
       default: '',
       userCanEdit: false,
       adminOnly: true
@@ -110,7 +140,8 @@ module.exports = {
     {
       key: 'apiToken',
       name: 'Splunk Authentication Token',
-      description: 'A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".',
+      description:
+        'A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".  If authenticating against a Splunk Cloud deployment, please leave this field blank.',
       default: '',
       type: 'password',
       userCanEdit: false,
@@ -140,7 +171,8 @@ module.exports = {
     {
       key: 'includeFieldNameInSummary',
       name: 'Include Field Name in Summary',
-      description: 'If checked, field names will be included as part of the summary fields. This option must be set to "User can view and edit" or "User can view only".',
+      description:
+        'If checked, field names will be included as part of the summary fields. This option must be set to "User can view and edit" or "User can view only".',
       default: true,
       type: 'boolean',
       userCanEdit: true,
