@@ -5,7 +5,7 @@ module.exports = {
    * @type String
    * @required
    */
-  name: 'Splunk Enterprise',
+  name: 'Splunk',
   /**
    * The acronym that appears in the notification window when information from this integration
    * is displayed.  Note that the acronym is included as part of each "tag" in the summary information
@@ -15,7 +15,7 @@ module.exports = {
    * @type String
    * @required
    */
-  acronym: 'SE',
+  acronym: 'SPLNK',
   /**
    * Description for this integration which is displayed in the Polarity integrations user interface
    *
@@ -23,7 +23,7 @@ module.exports = {
    * @optional
    */
   description:
-    'Splunk Enteprise allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
+    'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
   entityTypes: ['IPv4', 'IPv6', 'hash', 'email'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
@@ -99,9 +99,9 @@ module.exports = {
     },
     {
       key: 'url',
-      name: 'Base Splunk Enterprise URL',
+      name: 'Base Splunk URL',
       description:
-        'The base URL for the Splunk Enterprise REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089)',
+        'The base URL for the Splunk REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089)',
       type: 'text',
       default: '',
       userCanEdit: false,
@@ -111,7 +111,7 @@ module.exports = {
       key: 'searchAppUrl',
       name: 'Splunk Search App URL',
       description:
-        'The URL for the Splunk Enterprise Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
+        'The URL for the Splunk Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
       type: 'text',
       default: '',
       userCanEdit: false,
