@@ -24,7 +24,7 @@ module.exports = {
    */
   description:
     'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
-  entityTypes: ['IPv4', 'IPv6', 'hash', 'email'],
+  entityTypes: ['IPv4', 'IPv6', 'hash', 'email', 'domain'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
