@@ -2,11 +2,11 @@
   "main": "./integrations.js",
   "name": "Splunk",
   "description": "Splunk Query Engine",
-  "version": "3.1.0-beta",
+  "version": "3.1.2-beta",
   "private": true,
   "dependencies": {
-    "async": "^3.1",
+    "async": "^3.2.0",
     "node-cache": "^5.1.2",
-    "request": "^2.88"
+    "request": "^2.88.2"
   }
 }

@@ -2,9 +2,6 @@
     <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
 </div>
 {{#each details.results as |item index|}}
-    {{#if (gt index 0)}}
-        <hr>
-    {{/if}}
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <a {{action "showFields" index}} class="nav-link {{if item.showFields "active"}}" href="#">Fields</a>
