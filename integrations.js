@@ -64,7 +64,7 @@ function escapeEntityValue(entityValue) {
 function doLookup(entities, options, cb) {
   let lookupResults = [];
   let tasks = [];
-  const summaryFields = options.summaryFields.split(',');
+  const summaryFields = options.summaryFields.split(',').map(field => field.trim());
   Logger.debug({ entities }, 'Entities');
 
   entities.forEach((entity) => {
@@ -296,13 +296,6 @@ function validateOptions(userOptions, cb) {
     errors.push({
       key: 'apiToken',
       message: 'You must provide a valid Splunk Authentication Token'
-    });
-  }
-
-  if (typeof userOptions.summaryFields.value === 'string' && /\s/.test(userOptions.summaryFields.value)) {
-    errors.push({
-      key: 'summaryFields',
-      message: 'Summary Fields should not include spaces.'
     });
   }
 
