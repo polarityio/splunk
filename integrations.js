@@ -52,6 +52,15 @@ function startup(logger) {
   requestWithDefaults = request.defaults(defaults);
 }
 
+/**
+ * Used to escape double quotes in entities
+ * @param entityValue
+ * @returns {*}
+ */
+function escapeEntityValue(entityValue) {
+  return entityValue.replace(/"/g, '"');
+}
+
 function doLookup(entities, options, cb) {
   let lookupResults = [];
   let tasks = [];
@@ -65,7 +74,7 @@ function doLookup(entities, options, cb) {
       uri: `${options.url}/services/search/jobs/export`,
       qs: {
         output_mode: 'json',
-        search: options.searchString.replace(/{{ENTITY}}/gi, entity.value)
+        search: options.searchString.replace(/{{ENTITY}}/gi, escapeEntityValue(entity.value))
       },
       json: false
     };
@@ -214,7 +223,7 @@ function _formatErrorMessages(err) {
 const addAuthHeaders = (requestOptions, options, callback) => {
   if (options.isCloud) {
     const cachedToken = tokenCache.get(`${options.username}${options.password}`);
-    if (cachedToken) 
+    if (cachedToken)
       return callback(null, { ...requestOptions, headers: { Authorization: 'Splunk ' + cachedToken } });
 
     requestWithDefaults(
@@ -230,7 +239,7 @@ const addAuthHeaders = (requestOptions, options, callback) => {
       (error, res, body) => {
         const sessionKey = body && body[0] === '{' && JSON.parse(body).sessionKey;
         if (error || !sessionKey) return callback({ error, body, detail: 'Failed to get auth token for Splunk Cloud' });
-        
+
         tokenCache.set(`${options.username}${options.password}`, sessionKey);
         requestOptions.headers = { Authorization: 'Splunk ' + sessionKey };
         callback(null, requestOptions);
@@ -253,7 +262,7 @@ function validateOptions(userOptions, cb) {
       message: 'You must provide a valid Splunk URL'
     });
   }
-  
+
   if (typeof userOptions.url.value === 'string' && userOptions.url.value.endsWith('/')) {
     errors.push({
       key: 'url',
