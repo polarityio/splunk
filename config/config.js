@@ -151,8 +151,8 @@ module.exports = {
       key: 'searchString',
       name: 'Splunk Search String',
       description:
-        'Splunk Search String to execute. The string `{{ENTITY}}` will be replace by the looked up indicator. For example: search index=logs value={{ENTITY}} | head 10',
-      default: '',
+        'Splunk Search String to execute. The string `{{ENTITY}}` will be replace by the looked up indicator. For example: index=logs value={{ENTITY}} | head 10',
+      default: '{{ENTITY}} | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: true
