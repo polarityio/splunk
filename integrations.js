@@ -7,7 +7,17 @@ const fs = require('fs');
 const NodeCache = require('node-cache');
 const getAuthenticationOptionValidationErrors = require('./src/getAuthenticationOptionValidationErrors');
 const addAuthHeaders = require('./src/addAuthHeaders');
-const { size, get, flow, reduce, startsWith, replace, keys } = require('lodash/fp');
+const {
+  size,
+  get,
+  flow,
+  reduce,
+  startsWith,
+  replace,
+  keys,
+  trim,
+  toLower
+} = require('lodash/fp');
 
 const tokenCache = new NodeCache({
   stdTTL: 5 * 60
@@ -63,7 +73,11 @@ function startup(logger) {
  * @param entityValue
  * @returns {*}
  */
-const escapeQuotes = flow(get('value'), replace(/"/g, '"'));
+const escapeQuotes = flow(
+  get('value'),
+  replace(/(\r\n|\n|\r)/gm, ''),
+  replace(/"/g, '"')
+);
 
 function doLookup(entities, options, cb) {
   let lookupResults = [];
@@ -81,7 +95,9 @@ function doLookup(entities, options, cb) {
         search: flow(
           get('searchString'),
           (searchString) =>
-            startsWith('search', searchString) ? searchString : `search ${searchString}`,
+            flow(trim, toLower, startsWith('search'))(searchString)
+              ? searchString
+              : `search ${searchString}`,
           replace(/{{ENTITY}}/gi, escapeQuotes(entity))
         )(options)
       },
@@ -248,7 +264,8 @@ const validateOptions = async (options, callback) => {
     keys(options)
   );
 
-  // Testing the Search String Option for Parsing Issues
+  // Checking the Search String Option for Parsing Issues on User Option Splunk Credentials
+  // If we get a 400 and we have a query Parsing Error show error on Search String Option
   doLookup(
     [{ value: '8.8.8.8', type: 'IPv4' }],
     formattedOptions,
