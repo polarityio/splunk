@@ -15,7 +15,11 @@ const addAuthHeaders = (requestOptions, tokenCache, options, requestWithDefaults
       },
       (error, res, body) => {
         const sessionKey = body && body[0] === '{' && JSON.parse(body).sessionKey;
-        if (error || !sessionKey) return callback({ error, body, detail: 'Failed to get auth token for Splunk Cloud' });
+        if (error || !sessionKey) return callback({
+          statusCode: res.statusCode,
+          body,
+          detail: 'Failed to get auth token for Splunk Cloud'
+        });
 
         tokenCache.set(`${options.username}${options.password}`, sessionKey);
         requestOptions.headers = { Authorization: 'Splunk ' + sessionKey };

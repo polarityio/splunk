@@ -82,4 +82,43 @@ const _validateUrlOption = ({ value: url }, otherErrors = []) => {
   return otherErrors;
 };
 
-module.exports = getAuthenticationOptionValidationErrors;
+
+const ERROR_CHECK_BY_STATUS_CODE = {
+  400: (error) => {
+    try {
+      const parsedErrorMessage = fp.get(
+        'messages.0.text',
+        JSON.parse(fp.get('err.body', error))
+      );
+      return (
+        parsedErrorMessage && [
+          {
+            key: 'searchString',
+            message: `Search String Failed when tried with Splunk: ${parsedErrorMessage}`
+          }
+        ]
+      );
+    } catch (_) {}
+  },
+  401: (error, options) => [
+    {
+      key: options.isCloud.value ? 'isCloud' : 'apiToken',
+      message: `Authentication Failed when tried with Splunk.`
+    }
+  ],
+  403: (error, options) => [
+    {
+      key: options.isCloud.value ? 'isCloud' : 'apiToken',
+      message: `Authentication Failed when tried with Splunk: Insufficient Permission.`
+    }
+  ],
+  500: () => [
+    {
+      key: 'isCloud',
+      message: `Internal Splunk Error.  Make a change and try again`
+    }
+  ]
+};
+
+
+module.exports = { getAuthenticationOptionValidationErrors, ERROR_CHECK_BY_STATUS_CODE };
