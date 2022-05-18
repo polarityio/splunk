@@ -51,7 +51,7 @@ const executeQuery =
     requestWithDefaults(requestOptionsWithAuth, function (error, res, body) {
       if (error) {
         return done({
-          err: { statusCode: res.statusCode, body },
+          err: { statusCode: get('statusCode', res), body },
           detail: 'Error Executing HTTP Request to Splunk REST API'
         });
       }
@@ -59,7 +59,7 @@ const executeQuery =
       const taskError = EXPECTED_QUERY_STATUS_CODES.includes(res.statusCode)
         ? null
         : {
-            err: { statusCode: res.statusCode, body },
+            err: { statusCode: get('statusCode', res), body },
             detail: 'Query Request Status Code Unexpected'
           };
 
@@ -117,7 +117,7 @@ const buildQueryResultFromResponseStatus = (
   res,
   body
 ) =>
-  res.statusCode === 200
+  get('statusCode', res) === 200
     ? map((entity) => {
         // Splunk returns newline delimited JSON objects.  As a result we need to
         // custom parse the data.  We replace newlines with commas and then wrap the
@@ -135,7 +135,7 @@ const buildQueryResultFromResponseStatus = (
           search: requestOptionsWithAuth.qs.search
         };
       }, entityGroup)
-    : res.statusCode === 404
+    : get('statusCode', res) === 404
     ? map((entity) => ({ entity, body: null }), entityGroup)
     : [];
 
