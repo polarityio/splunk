@@ -14,7 +14,8 @@ const {
   map,
   uniqWith,
   isEqual,
-  pick
+  pick,
+  size
 } = require('lodash/fp');
 
 const { searchKvStoreAndAddToResults } = require('./getKvStoreQueryResults');
@@ -151,7 +152,7 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
 
       return {
         entity,
-        searchResponseBody: bodyResultsForThisEntity,
+        searchResponseBody: size(bodyResultsForThisEntity) ? bodyResultsForThisEntity : null,
         searchQuery
       };
     }, entityGroup);
