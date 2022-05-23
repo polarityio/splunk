@@ -177,6 +177,39 @@ module.exports = {
       type: 'boolean',
       userCanEdit: true,
       adminOnly: false
+    },
+
+    {
+      key: 'searchKvStore',
+      name: 'Search KV Store',
+      description:
+        'If checked, the KV Store will be searched using the parameters below.',
+      default: false,
+      type: 'boolean',
+      userCanEdit: true,
+      adminOnly: false
+    },
+    {
+      key: 'kvStoreAppsAndCollections',
+      name: 'KV Store Apps & Collections to Search',
+      description:
+        'A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on.  Each comma separated pair must use the format "<app-name>:<collection-name>". \n' +
+        'To see a list of available collections to search, leave this field empty, check the "Search KV Store" option above, and click "Apply Changes".',
+      default: '',
+      type: 'text',
+      userCanEdit: true,
+      adminOnly: false
+    },
+    {
+      key: 'kvStoreSearchStringFields',
+      name: 'KV Store Search Fields',
+      description:
+        'A comma separated list of KV Store Collection Fields to search on. \n' +
+        'To see a list of available fields to search on, leave this field empty, check the "Search KV Store" option above, and set "KV Store Apps & Collections to Search" to your desired collections, then click "Apply Changes".' +'\nNote: Minimizing these will improve search times.',
+      default: '',
+      type: 'text',
+      userCanEdit: true,
+      adminOnly: false
     }
   ]
 };

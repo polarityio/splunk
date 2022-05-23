@@ -1,27 +1,17 @@
 'use strict';
 
-const request = require('request');
+const request = require('postman-request');
 const config = require('./config/config');
 const async = require('async');
 const fs = require('fs');
 const NodeCache = require('node-cache');
-const {
-  size,
-  get,
-  flow,
-  reduce,
-  keys,
-  getOr,
-  chunk,
-  flatten,
-  map
-} = require('lodash/fp');
+const { size, get, flow, reduce, keys, chunk, flatten, map } = require('lodash/fp');
 
-const {
-  getAuthenticationOptionValidationErrors,
-  ERROR_CHECK_BY_STATUS_CODE
-} = require('./src/getAuthenticationOptionValidationErrors');
+const getAuthenticationOptionValidationErrors = require('./src/getAuthenticationOptionValidationErrors');
+const getQueryStringOptionValidationErrors = require('./src/getQueryStringOptionValidationErrors');
+const getKvStoreOptionValidationErrors = require('./src/getKvStoreOptionValidationErrors');
 const buildMultiEntityQueryTask = require('./src/buildMultiEntityQueryTask');
+const addAuthHeaders = require('./src/addAuthHeaders');
 
 const tokenCache = new NodeCache({
   stdTTL: 5 * 60
@@ -69,19 +59,30 @@ function startup(logger) {
     defaults.rejectUnauthorized = config.request.rejectUnauthorized;
   }
 
-  requestWithDefaults = request.defaults(defaults);
+  const startingRequestWithDefaults = request.defaults(defaults);
+
+  requestWithDefaults = (requestOptions, options, callback) =>
+    addAuthHeaders(
+      requestOptions,
+      tokenCache,
+      options,
+      startingRequestWithDefaults,
+      (err, requestOptionsWithAuth) => {
+        if (err) return callback({ ...err, isAuthError: true });
+
+        startingRequestWithDefaults(requestOptionsWithAuth, callback);
+      }
+    );
 }
 
-
-function doLookup(entities, options, cb) {
-  let lookupResults = [];
+const doLookup = (entities, options, cb) => {
   const summaryFields = options.summaryFields.split(',').map((field) => field.trim());
   Logger.debug({ entities }, 'Entities');
 
   let tasks = flow(
     chunk(10),
     map((entityGroup) =>
-      buildMultiEntityQueryTask(entityGroup, tokenCache, options, requestWithDefaults)
+      buildMultiEntityQueryTask(entityGroup, options, requestWithDefaults, Logger)
     )
   )(entities);
 
@@ -92,47 +93,52 @@ function doLookup(entities, options, cb) {
       return;
     }
 
-    flatten(results).forEach((result) => {
-      /**
-       * A search result body with no results is of the form:
-       *     body: [
-       *       {
-       *         "preview": false,
-       *         "lastrow": true
-       *       }
-       *     ]
-       * Search results with data will always have a `result` property.  We check for the result
-       * to determine if the search had a hit or not.
-       *    body: [
-       *       {
-       *         "preview": false,
-       *         "lastrow": true,
-       *         "result": {}
-       *       }
-       *     ]
-       **/
-      const body = get('body', result);
-      const thereAreNoResults = !body || (size(body) > 0 && !get('0.result', body));
+    const lookupResults = flow(
+      flatten,
+      map((result) => {
+        /**
+         * A search result body with no results is of the form:
+         *     body: [
+         *       {
+         *         "preview": false,
+         *         "lastrow": true
+         *       }
+         *     ]
+         * Search results with data will always have a `result` property.  We check for the result
+         * to determine if the search had a hit or not.
+         *    body: [
+         *       {
+         *         "preview": false,
+         *         "lastrow": true,
+         *         "result": {}
+         *       }
+         *     ]
+         **/
+        const searchResponseBody = get('searchResponseBody', result);
+        const thereAreNoResults =
+          !searchResponseBody ||
+          (size(searchResponseBody) > 0 && !get('0.result', searchResponseBody));
 
-      lookupResults.push({
-        entity: result.entity,
-        data: thereAreNoResults
-          ? null
-          : {
-              summary: [],
-              details: {
-                results: result.body,
-                search: result.search,
-                tags: _getSummaryTags(result.body, summaryFields)
+        return {
+          entity: result.entity,
+          data: thereAreNoResults
+            ? null
+            : {
+                summary: [],
+                details: {
+                  results: searchResponseBody,
+                  search: result.searchQuery,
+                  tags: _getSummaryTags(result.searchResponseBody, summaryFields)
+                }
               }
-            }
-      });
-    });
+        };
+      })
+    )(results);
 
     Logger.debug({ lookupResults }, 'Results');
     cb(null, lookupResults);
   });
-}
+};
 
 function _getSummaryTags(results, summaryFields) {
   const tags = new Map();
@@ -162,20 +168,19 @@ const validateOptions = async (options, callback) => {
     keys(options)
   );
 
-  // Checking the Search String Option for Parsing Issues on User Option Splunk Credentials
-  doLookup(
-    [{ value: '8.8.8.8', type: 'IPv4' }],
+  const queryStringOptionErrors = await getQueryStringOptionValidationErrors(
     formattedOptions,
-    (error, lookupResults) =>
-      callback(
-        null,
-        getOr(
-          () => [],
-          get('err.statusCode', error),
-          ERROR_CHECK_BY_STATUS_CODE
-        )(error, options) || []
-      )
+    doLookup
   );
+  if (size(queryStringOptionErrors)) return callback(null, queryStringOptionErrors);
+
+  const kvStoreOptionErrorsAndInfoMessages = await getKvStoreOptionValidationErrors(
+    formattedOptions,
+    requestWithDefaults,
+    Logger
+  );
+
+  callback(null, kvStoreOptionErrorsAndInfoMessages || []);
 };
 
 module.exports = {

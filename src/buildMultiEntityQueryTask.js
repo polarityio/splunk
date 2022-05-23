@@ -11,71 +11,72 @@ const {
   includes,
   first,
   filter,
-  map
+  map,
+  uniqWith,
+  isEqual,
+  pick
 } = require('lodash/fp');
 
-const addAuthHeaders = require('./addAuthHeaders');
+const { searchKvStoreAndAddToResults } = require('./getKvStoreQueryResults');
 
 const EXPECTED_QUERY_STATUS_CODES = [200, 404];
 
 const buildMultiEntityQueryTask =
-  (entityGroup, tokenCache, options, requestWithDefaults) => (done) => {
-    const requestOptions = {
-      method: 'GET',
-      uri: `${options.url}/services/search/jobs/export`,
-      qs: {
-        search: buildSearchString(entityGroup, options),
-        output_mode: 'json'
+  (entityGroup, options, requestWithDefaults, Logger) => (done) =>
+    requestWithDefaults(
+      {
+        method: 'GET',
+        uri: `${options.url}/services/search/jobs/export`,
+        qs: {
+          search: buildSearchString(entityGroup, options, Logger),
+          output_mode: 'json'
+        },
+        json: false
       },
-      json: false
-    };
+      options,
+      handleStandardQueryResponse(entityGroup, options, requestWithDefaults, done, Logger)
+    );
 
-    addAuthHeaders(
-      requestOptions,
-      tokenCache,
+const handleStandardQueryResponse =
+  (entityGroup, options, requestWithDefaults, done, Logger) => (err, res, body) => {
+    const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
+      get('statusCode', res)
+    );
+    if (err || responseHadUnexpectedStatusCode) {
+      const formattedError = get('isAuthError', err)
+        ? {
+            err,
+            detail: 'Error Getting Auth Token'
+          }
+        : {
+            err: { statusCode: get('statusCode', res), body },
+            detail: responseHadUnexpectedStatusCode
+              ? 'Standard Query Request Status Code Unexpected'
+              : 'Error Executing HTTP Request to Splunk REST API'
+          };
+
+      return done(formattedError);
+    }
+
+    const taskResult = buildQueryResultFromResponseStatus(
+      entityGroup,
+      options,
+      res,
+      body
+    );
+    if (!options.searchKvStore) return done(null, taskResult);
+
+    searchKvStoreAndAddToResults(
+      entityGroup,
+      taskResult,
       options,
       requestWithDefaults,
-      executeQuery(entityGroup, requestWithDefaults, done)
+      done,
+      Logger
     );
   };
 
-const executeQuery =
-  (entityGroup, requestWithDefaults, done) => (err, requestOptionsWithAuth) => {
-    if (err) {
-      return done({
-        err,
-        detail: 'Error Getting Auth Token'
-      });
-    }
-
-    requestWithDefaults(requestOptionsWithAuth, function (error, res, body) {
-      if (error) {
-        return done({
-          err: { statusCode: get('statusCode', res), body },
-          detail: 'Error Executing HTTP Request to Splunk REST API'
-        });
-      }
-
-      const taskError = EXPECTED_QUERY_STATUS_CODES.includes(res.statusCode)
-        ? null
-        : {
-            err: { statusCode: get('statusCode', res), body },
-            detail: 'Query Request Status Code Unexpected'
-          };
-
-      // extract out to package
-      const taskResult = buildQueryResultFromResponseStatus(
-        entityGroup,
-        requestOptionsWithAuth,
-        res,
-        body
-      );
-
-      return done(taskError, taskResult);
-    });
-  };
-
-const buildSearchString = (entityGroup, options) => {
+const buildSearchString = (entityGroup, options, Logger) => {
   const searchString = flow(get('searchString'), trim)(options);
   const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
     ? flow(replace(/search/i, ''), trim)(searchString)
@@ -104,40 +105,56 @@ const buildSearchString = (entityGroup, options) => {
  * @param entityValue
  * @returns {*}
  */
-const escapeQuotes = flow(
-  get('value'),
-  replace(/(\r\n|\n|\r)/gm, ''),
-  replace(/"/g, '"')
-);
+const escapeQuotes = flow(get('value'), replace(/(\r\n|\n|\r)/gm, ''), replace(/"/g, ''));
 
+const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => {
+  const statusSuccess = get('statusCode', res) === 200;
 
-const buildQueryResultFromResponseStatus = (
-  entityGroup,
-  requestOptionsWithAuth,
-  res,
-  body
-) =>
-  get('statusCode', res) === 200
-    ? map((entity) => {
-        // Splunk returns newline delimited JSON objects.  As a result we need to
-        // custom parse the data.  We replace newlines with commas and then wrap the
-        // text in an array so the end result is an array of result objects.
-        const formattedBody = JSON.parse(`[${flow(trim, replace(/\n/g, ','))(body)}]`);
+  // Splunk returns newline delimited JSON objects.  As a result we need to
+  // custom parse the data.  We replace newlines with commas and then wrap the
+  // text in an array so the end result is an array of result objects.
+  const formattedBody =
+    statusSuccess &&
+    flow(
+      trim,
+      replace(/\n/g, ','),
+      (commaDelineatedResult) => JSON.parse(`[${commaDelineatedResult}]`),
+      map(pick('result')),
+      uniqWith(isEqual)
+    )(body);
 
-        const bodyResultsForThisEntity = getObjectsContainingString(
-          entity.value,
-          formattedBody
-        );
+  const successResult =
+    statusSuccess &&
+    map((entity) => {
+      const bodyResultsForThisEntity = getObjectsContainingString(
+        entity.value,
+        formattedBody
+      );
 
-        return {
-          entity,
-          body: bodyResultsForThisEntity,
-          search: requestOptionsWithAuth.qs.search
-        };
-      }, entityGroup)
-    : get('statusCode', res) === 404
-    ? map((entity) => ({ entity, body: null }), entityGroup)
-    : [];
+      const searchString = flow(get('searchString'), trim)(options);
+
+      const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
+        ? flow(replace(/search/i, ''), trim)(searchString)
+        : searchString;
+
+      const searchQuery = `search ${replace(
+        /{{ENTITY}}/gi,
+        escapeQuotes(entity),
+        searchStringWithoutPrefix
+      )}`;
+
+      return {
+        entity,
+        searchResponseBody: bodyResultsForThisEntity,
+        searchQuery
+      };
+    }, entityGroup);
+
+  const emptyResult =
+    get('statusCode', res) === 404 && map((entity) => ({ entity }), entityGroup);
+
+  return successResult || emptyResult || [];
+};
 
 const getObjectsContainingString = (string, objs) =>
   filter(

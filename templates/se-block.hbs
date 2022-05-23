@@ -1,6 +1,8 @@
-<div class="title-block">
-    <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
-</div>
+{{#if (and block.userOptions.searchAppUrl details.search)}}
+    <div class="title-block">
+        <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}&earliest=0" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}&display.page.search.mode=smart&dispatch.sample_ratio=1&&earliest=0" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
+    </div>
+{{/if}}
 {{#each details.results as |item index|}}
     <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -21,7 +23,7 @@
         <div class="tab-container scrollable-block">
             {{#each item.fields as |field|}}
                 <div>
-                    <span class="p-key">{{humanize field.key}}:</span>
+                    <span class="p-key">{{titleize (humanize (dasherize field.key))}}:</span>
                     <span class="p-value">{{field.value}}</span>
                 </div>
             {{/each}}

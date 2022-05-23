@@ -121,6 +121,19 @@ Comma delimited list of field values to include as part of the summary (no space
  score,status
  ```
  
+
+### Search KV Store
+If checked, the KV Store will be searched using the parameters below.
+
+### KV Store Apps & Collections to Search
+A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on.  Each comma separated pair must use the format `<app-name>:<collection-name>`
+To see a list of available collections to search, leave this field empty, check the "Search KV Store" option above, and click "Apply Changes".
+
+### KV Store Search Fields
+A comma separated list of KV Store Collection Fields to search on. To see a list of available fields to search on, leave this field empty, check the "Search KV Store" option above, and set "KV Store Apps & Collections to Search" to your desired collections, then click "Apply Changes".
+> ***Note:*** Minimizing these will improve KV Store search times.
+
+
  ## Installation Instructions
 
 Installation instructions for integrations are provided on the [PolarityIO GitHub Page](https://polarityio.github.io/).

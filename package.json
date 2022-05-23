@@ -8,6 +8,6 @@
     "async": "^3.2.0",
     "lodash": "^4.17.21",
     "node-cache": "^5.1.2",
-    "request": "^2.88.2"
+    "postman-request": "^2.88.1-postman.31"
   }
 }
