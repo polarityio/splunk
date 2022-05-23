@@ -151,8 +151,8 @@ module.exports = {
       key: 'searchString',
       name: 'Splunk Search String',
       description:
-        'Splunk Search String to execute. The string `{{ENTITY}}` will be replace by the looked up indicator. For example: search index=logs value={{ENTITY}} | head 10',
-      default: '',
+        'Splunk Search String to execute. The string `{{ENTITY}}` will be replace by the looked up indicator. For example: index=logs value={{ENTITY}} | head 10',
+      default: '{{ENTITY}} | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: true
@@ -175,6 +175,41 @@ module.exports = {
         'If checked, field names will be included as part of the summary fields. This option must be set to "User can view and edit" or "User can view only".',
       default: true,
       type: 'boolean',
+      userCanEdit: true,
+      adminOnly: false
+    },
+
+    {
+      key: 'searchKvStore',
+      name: 'Search KV Store',
+      description:
+        'If checked, the KV Store will be searched using the parameters below, which will replace and disable your Standard Splunk Search above.',
+      default: false,
+      type: 'boolean',
+      userCanEdit: true,
+      adminOnly: false
+    },
+    {
+      key: 'kvStoreAppsAndCollections',
+      name: 'KV Store Apps & Collections to Search',
+      description:
+        'A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on.  Each comma separated pair must use the format "<app-name>:<collection-name>". \n' +
+        'To see a list of available collections to search, leave this field empty, check the "Search KV Store" option above, and click "Apply Changes".',
+      default: '',
+      type: 'text',
+      userCanEdit: true,
+      adminOnly: false
+    },
+    {
+      key: 'kvStoreSearchStringFields',
+      name: 'KV Store Search Fields',
+      description:
+        'A comma separated list of KV Store Collection Fields to search on.\n' +
+        'To see a list of available fields to search on, leave this field empty, check the "Search KV Store" option above, and set "KV Store Apps & Collections to Search" to your desired collections, then click "Apply Changes".\n' +
+        'Note: Minimizing these will improve search times.\n' +
+        'Note: You can also use these fields in the "Summary Fields" option above.',
+      default: '',
+      type: 'text',
       userCanEdit: true,
       adminOnly: false
     }
