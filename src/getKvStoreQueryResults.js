@@ -29,7 +29,6 @@ const MAX_PARALLEL_LOOKUPS = 10;
 
 const searchKvStoreAndAddToResults = (
   entityGroup,
-  taskResult,
   options,
   requestWithDefaults,
   done,
@@ -88,37 +87,7 @@ const searchKvStoreAndAddToResults = (
       }, entityGroup)
     );
 
-    const kvStoreResultsWithAddedNormalSearchResults = map((kvStoreResult) => {
-      const normalResultForThisEntity = find(
-        (result) => get('entity.value', result) === get('entity.value', kvStoreResult),
-        taskResult
-      );
-
-      return {
-        entity: kvStoreResult.entity,
-        ...normalResultForThisEntity,
-        searchResponseBody: flow(
-          get('searchResponseBody'),
-          concat(__, get('searchResponseBody', normalResultForThisEntity) || []),
-          orderBy(get('Found_In_KV_Store'), 'desc')
-        )(kvStoreResult)
-      };
-    }, kvStoreResultsByEntity);
-
-    const entitiesWithoutKvStoreResults = filter(
-      (result) =>
-        !find(
-          (kvStoreResult) =>
-            get('entity.value', result) === get('entity.value', kvStoreResult),
-          kvStoreResultsByEntity
-        ),
-      taskResult
-    );
-
-    return done(
-      null,
-      concat(kvStoreResultsWithAddedNormalSearchResults, entitiesWithoutKvStoreResults)
-    );
+    return done(null, kvStoreResultsByEntity);
   });
 };
 
@@ -154,7 +123,6 @@ const getKvStoreQueryResultForAllCollections = (
 
       const formattedBody = map(
         flow((record) => ({
-          Found_In_KV_Store: true,
           KV_Store_App_Name: appName,
           KV_Store_Collection_Name: collectionName,
           ...record

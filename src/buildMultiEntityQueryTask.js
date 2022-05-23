@@ -23,19 +23,33 @@ const EXPECTED_QUERY_STATUS_CODES = [200, 404];
 
 const buildMultiEntityQueryTask =
   (entityGroup, options, requestWithDefaults, Logger) => (done) =>
-    requestWithDefaults(
-      {
-        method: 'GET',
-        uri: `${options.url}/services/search/jobs/export`,
-        qs: {
-          search: buildSearchString(entityGroup, options, Logger),
-          output_mode: 'json'
-        },
-        json: false
-      },
-      options,
-      handleStandardQueryResponse(entityGroup, options, requestWithDefaults, done, Logger)
-    );
+    !options.searchKvStore
+      ? requestWithDefaults(
+          {
+            method: 'GET',
+            uri: `${options.url}/services/search/jobs/export`,
+            qs: {
+              search: buildSearchString(entityGroup, options, Logger),
+              output_mode: 'json'
+            },
+            json: false
+          },
+          options,
+          handleStandardQueryResponse(
+            entityGroup,
+            options,
+            requestWithDefaults,
+            done,
+            Logger
+          )
+        )
+      : searchKvStoreAndAddToResults(
+          entityGroup,
+          options,
+          requestWithDefaults,
+          done,
+          Logger
+        );;
 
 const handleStandardQueryResponse =
   (entityGroup, options, requestWithDefaults, done, Logger) => (err, res, body) => {
@@ -64,16 +78,8 @@ const handleStandardQueryResponse =
       res,
       body
     );
-    if (!options.searchKvStore) return done(null, taskResult);
 
-    searchKvStoreAndAddToResults(
-      entityGroup,
-      taskResult,
-      options,
-      requestWithDefaults,
-      done,
-      Logger
-    );
+    done(null, taskResult);
   };
 
 const buildSearchString = (entityGroup, options, Logger) => {
