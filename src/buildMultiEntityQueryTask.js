@@ -53,10 +53,12 @@ const buildMultiEntityQueryTask =
         );;
 
 const handleStandardQueryResponse =
-  (entityGroup, options, requestWithDefaults, done, Logger) => (err, res, body) => {
+  (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
     const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
       get('statusCode', res)
     );
+
+    const err = JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
     if (err || responseHadUnexpectedStatusCode) {
       const formattedError = get('isAuthError', err)
         ? {
@@ -64,7 +66,7 @@ const handleStandardQueryResponse =
             detail: 'Error Getting Auth Token'
           }
         : {
-            err: { statusCode: get('statusCode', res), body },
+            err: { ...err, statusCode: get('statusCode', res), body },
             detail: responseHadUnexpectedStatusCode
               ? 'Standard Query Request Status Code Unexpected'
               : 'Error Executing HTTP Request to Splunk REST API'
