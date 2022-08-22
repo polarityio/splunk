@@ -58,7 +58,7 @@ const handleStandardQueryResponse =
       get('statusCode', res)
     );
 
-    const err = JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    const err = error && JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
     if (err || responseHadUnexpectedStatusCode) {
       const formattedError = get('isAuthError', err)
         ? {

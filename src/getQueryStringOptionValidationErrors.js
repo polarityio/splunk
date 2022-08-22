@@ -33,12 +33,6 @@ const CHECK_ERROR_BY_ERROR_MESSAGE = {
       key: 'url',
       message: `ECONNREFUSED - Server could not be reached.`
     }
-  ],
-  undefined: (error, options) => [
-    {
-      key: 'url',
-      message: JSON.stringify(error)
-    }
   ]
 };
 
@@ -82,7 +76,15 @@ const ERROR_CHECK_BY_STATUS_CODE = {
       keys,
       find((key) => includes(key, get('err.message', error))),
       (key) => get(key, CHECK_ERROR_BY_ERROR_MESSAGE),
-      (func) => func(error, options)
+      (func) =>
+        func
+          ? func(error, options)
+          : [
+              // {
+              //     key: 'url', // For Logging
+              //     message: JSON.stringify(error)
+              //   }
+            ]
     )(CHECK_ERROR_BY_ERROR_MESSAGE)
 };
 
