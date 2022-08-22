@@ -68,7 +68,10 @@ function startup(logger) {
       options,
       startingRequestWithDefaults,
       (err, requestOptionsWithAuth) => {
-        if (err) return callback({ ...err, isAuthError: true });
+        if (err) return callback({
+          ...JSON.parse(JSON.stringify(err, Object.getOwnPropertyNames(err))),
+          isAuthError: true
+        });
 
         startingRequestWithDefaults(requestOptionsWithAuth, callback);
       }
