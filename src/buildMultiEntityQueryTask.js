@@ -2,7 +2,6 @@
 
 const {
   flow,
-  reduce,
   startsWith,
   replace,
   get,
@@ -17,6 +16,8 @@ const {
   pick,
   size
 } = require('lodash/fp');
+
+const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
 const { searchKvStoreAndAddToResults } = require('./getKvStoreQueryResults');
 
@@ -92,17 +93,19 @@ const buildSearchString = (entityGroup, options, Logger) => {
     : searchString;
 
   const fullMutliEntitySearchString = reduce(
-    (agg, entity) =>
-      `${agg} | append [ search ${replace(
-        /{{ENTITY}}/gi,
-        escapeQuotes(entity),
-        searchStringWithoutPrefix
-      )}]`,
-    `search ${replace(
-      /{{ENTITY}}/gi,
-      flow(first, escapeQuotes)(entityGroup),
-      searchStringWithoutPrefix
-    )}`,
+    (agg, entity, index) =>
+      index === 0
+        ? `search ${replace(
+            /{{ENTITY}}/gi,
+            flow(first, escapeQuotes)(entityGroup),
+            searchStringWithoutPrefix
+          )}`
+        : `${agg} | append [ search ${replace(
+            /{{ENTITY}}/gi,
+            escapeQuotes(entity),
+            searchStringWithoutPrefix
+          )}]`,
+    '',
     entityGroup
   );
 
