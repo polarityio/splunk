@@ -2,6 +2,16 @@
 
 polarity.export = PolarityComponent.extend({
   details: Ember.computed.alias('block.data.details'),
+  init() {
+    this.get('details.results').forEach((result, index) => {
+      this._initFields(index);
+      Ember.set(result, 'showFields', true);
+      Ember.set(result, 'showTable', false);
+      Ember.set(result, 'showJson', false);
+      Ember.set(result, 'showSource', false);
+    });
+    this._super(...arguments);
+  },
   onDetailsOpened() {
     this.get('details.results').forEach((result, index) => {
       this._initFields(index);
