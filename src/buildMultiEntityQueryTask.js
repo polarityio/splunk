@@ -2,7 +2,6 @@
 
 const {
   flow,
-  reduce,
   startsWith,
   replace,
   get,
@@ -17,6 +16,8 @@ const {
   pick,
   size
 } = require('lodash/fp');
+
+const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
 const { searchKvStoreAndAddToResults } = require('./getKvStoreQueryResults');
 
@@ -53,10 +54,12 @@ const buildMultiEntityQueryTask =
         );;
 
 const handleStandardQueryResponse =
-  (entityGroup, options, requestWithDefaults, done, Logger) => (err, res, body) => {
+  (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
     const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
       get('statusCode', res)
     );
+
+    const err = error && JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
     if (err || responseHadUnexpectedStatusCode) {
       const formattedError = get('isAuthError', err)
         ? {
@@ -64,7 +67,7 @@ const handleStandardQueryResponse =
             detail: 'Error Getting Auth Token'
           }
         : {
-            err: { statusCode: get('statusCode', res), body },
+            err: { ...err, statusCode: get('statusCode', res), body },
             detail: responseHadUnexpectedStatusCode
               ? 'Standard Query Request Status Code Unexpected'
               : 'Error Executing HTTP Request to Splunk REST API'
@@ -90,17 +93,19 @@ const buildSearchString = (entityGroup, options, Logger) => {
     : searchString;
 
   const fullMutliEntitySearchString = reduce(
-    (agg, entity) =>
-      `${agg} | append [ search ${replace(
-        /{{ENTITY}}/gi,
-        escapeQuotes(entity),
-        searchStringWithoutPrefix
-      )}]`,
-    `search ${replace(
-      /{{ENTITY}}/gi,
-      flow(first, escapeQuotes)(entityGroup),
-      searchStringWithoutPrefix
-    )}`,
+    (agg, entity, index) =>
+      index === 0
+        ? `search ${replace(
+            /{{ENTITY}}/gi,
+            flow(first, escapeQuotes)(entityGroup),
+            searchStringWithoutPrefix
+          )}`
+        : `${agg} | append [ search ${replace(
+            /{{ENTITY}}/gi,
+            escapeQuotes(entity),
+            searchStringWithoutPrefix
+          )}]`,
+    '',
     entityGroup
   );
 
