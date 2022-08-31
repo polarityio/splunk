@@ -51,15 +51,15 @@ const buildMultiEntityQueryTask =
           requestWithDefaults,
           done,
           Logger
-        );;
-
+        );
 const handleStandardQueryResponse =
   (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
     const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
       get('statusCode', res)
     );
 
-    const err = error && JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    const err =
+      error && JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
     if (err || responseHadUnexpectedStatusCode) {
       const formattedError = get('isAuthError', err)
         ? {
@@ -87,29 +87,49 @@ const handleStandardQueryResponse =
   };
 
 const buildSearchString = (entityGroup, options, Logger) => {
-  const searchString = flow(get('searchString'), trim)(options);
-  const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
-    ? flow(replace(/search/i, ''), trim)(searchString)
-    : searchString;
+  let directSearchEntity = isDirectSearch(entityGroup);
+  if (directSearchEntity) {
+    return buildDirectSearchString(directSearchEntity, options, Logger);
+  } else {
+    const searchString = flow(get('searchString'), trim)(options);
+    const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
+      ? flow(replace(/search/i, ''), trim)(searchString)
+      : searchString;
 
-  const fullMutliEntitySearchString = reduce(
-    (agg, entity, index) =>
-      index === 0
-        ? `search ${replace(
-            /{{ENTITY}}/gi,
-            flow(first, escapeQuotes)(entityGroup),
-            searchStringWithoutPrefix
-          )}`
-        : `${agg} | append [ search ${replace(
-            /{{ENTITY}}/gi,
-            escapeQuotes(entity),
-            searchStringWithoutPrefix
-          )}]`,
-    '',
-    entityGroup
+    const fullMutliEntitySearchString = reduce(
+      (agg, entity, index) =>
+        index === 0
+          ? `search ${replace(
+              /{{ENTITY}}/gi,
+              flow(first, escapeQuotes)(entityGroup),
+              searchStringWithoutPrefix
+            )}`
+          : `${agg} | append [ search ${replace(
+              /{{ENTITY}}/gi,
+              escapeQuotes(entity),
+              searchStringWithoutPrefix
+            )}]`,
+      '',
+      entityGroup
+    );
+
+    return fullMutliEntitySearchString;
+  }
+};
+
+const isDirectSearch = (entityGroup) => {
+  const entity = entityGroup.find((entity) =>
+    Array.isArray(entity.types)
+      ? entity.types.indexOf('custom.splunkSearch') >= 0
+      : undefined
   );
+  if (entity && entity.requestContext && entity.requestContext.isUserInitiated) {
+    return entity;
+  }
+};
 
-  return fullMutliEntitySearchString;
+const buildDirectSearchString = (entity, options, Logger) => {
+  return entity.value;
 };
 
 /**
@@ -157,7 +177,9 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
 
       return {
         entity,
-        searchResponseBody: size(bodyResultsForThisEntity) ? bodyResultsForThisEntity : null,
+        searchResponseBody: size(bodyResultsForThisEntity)
+          ? bodyResultsForThisEntity
+          : null,
         searchQuery
       };
     }, entityGroup);

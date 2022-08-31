@@ -61,24 +61,25 @@ function startup(logger) {
 
   const startingRequestWithDefaults = request.defaults(defaults);
 
-  requestWithDefaults = (requestOptions, options, callback) =>
-    addAuthHeaders(
-      requestOptions,
-      options,
-      (err, requestOptionsWithAuth) => {
-        if (err) return callback({
-          ...JSON.parse(JSON.stringify(err, Object.getOwnPropertyNames(err))),
-          isAuthError: true
-        });
+  requestWithDefaults = (requestOptions, options, callback) => {
+    Logger.trace({requestOptions}, 'Request Options');
+    return addAuthHeaders(
+        requestOptions,
+        tokenCache,
+        options,
+        startingRequestWithDefaults,
+        (err, requestOptionsWithAuth) => {
+          if (err) return callback({...err, isAuthError: true});
 
-        startingRequestWithDefaults(requestOptionsWithAuth, callback);
-      }
+          startingRequestWithDefaults(requestOptionsWithAuth, callback);
+        }
     );
+  }
 }
 
 const doLookup = (entities, options, cb) => {
   const summaryFields = options.summaryFields.split(',').map((field) => field.trim());
-  Logger.debug({ entities }, 'Entities');
+  Logger.info({ entities }, 'Entities');
 
   let tasks = flow(
     chunk(10),
