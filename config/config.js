@@ -83,7 +83,7 @@ module.exports = {
     rejectUnauthorized: true
   },
   logging: {
-    level: 'trace' //trace, debug, info, warn, error, fatal
+    level: 'info' //trace, debug, info, warn, error, fatal
   },
   /**
    * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
@@ -184,7 +184,6 @@ module.exports = {
       userCanEdit: true,
       adminOnly: false
     },
-
     {
       key: 'searchKvStore',
       name: 'Search KV Store',
@@ -217,6 +216,26 @@ module.exports = {
       default: '',
       type: 'text',
       userCanEdit: true,
+      adminOnly: false
+    },
+    {
+      key: 'directSearchMaxTimeframe',
+      name: 'Earliest SPL Time Bounds',
+      description:
+        'Sets the earliest (inclusive) time bounds for the search when directly searching using a Splunk SPL query. This option only applies to SPL queries directly input by the user and does not limit the results returned by the `Splunk Search String` option. This option should be set to "Users can view only".  Defaults to `-1mon`.',
+      default: '-1mon',
+      type: 'text',
+      userCanEdit: false,
+      adminOnly: false
+    },
+    {
+      key: 'directSearchMaxResults',
+      name: 'Maximum SPL Results',
+      description:
+        'The maximum number of results to return when directly searching using a Splunk SPL query. This option only applies to SPL queries directly input by the user and does not limit the results returned by the `Splunk Search String` option. This option should be set to "Users can view only".  Defaults to 10.',
+      default: 10,
+      type: 'number',
+      userCanEdit: false,
       adminOnly: false
     }
   ]

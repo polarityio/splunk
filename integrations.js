@@ -5,7 +5,17 @@ const config = require('./config/config');
 const async = require('async');
 const fs = require('fs');
 const NodeCache = require('node-cache');
-const { size, get, flow, reduce, keys, chunk, flatten, map } = require('lodash/fp');
+const {
+  size,
+  get,
+  getOr,
+  flow,
+  reduce,
+  keys,
+  chunk,
+  flatten,
+  map
+} = require('lodash/fp');
 
 const getAuthenticationOptionValidationErrors = require('./src/getAuthenticationOptionValidationErrors');
 const getQueryStringOptionValidationErrors = require('./src/getQueryStringOptionValidationErrors');
@@ -62,24 +72,18 @@ function startup(logger) {
   const startingRequestWithDefaults = request.defaults(defaults);
 
   requestWithDefaults = (requestOptions, options, callback) => {
-    Logger.trace({requestOptions}, 'Request Options');
-    return addAuthHeaders(
-        requestOptions,
-        tokenCache,
-        options,
-        startingRequestWithDefaults,
-        (err, requestOptionsWithAuth) => {
-          if (err) return callback({...err, isAuthError: true});
+    return addAuthHeaders(requestOptions, options, (err, requestOptionsWithAuth) => {
+      Logger.trace({ requestOptionsWithAuth }, 'Request Options');
+      if (err) return callback({ ...err, isAuthError: true });
 
-          startingRequestWithDefaults(requestOptionsWithAuth, callback);
-        }
-    );
-  }
+      startingRequestWithDefaults(requestOptionsWithAuth, callback);
+    });
+  };
 }
 
 const doLookup = (entities, options, cb) => {
   const summaryFields = options.summaryFields.split(',').map((field) => field.trim());
-  Logger.info({ entities }, 'Entities');
+  Logger.trace({ entities }, 'Entities');
 
   let tasks = flow(
     chunk(10),
@@ -117,8 +121,12 @@ const doLookup = (entities, options, cb) => {
          *     ]
          **/
         const searchResponseBody = get('searchResponseBody', result);
+        const searchSyntaxErrors = getOr([], 'searchSyntaxErrors', result);
+        Logger.trace({ searchResponseBody, result }, 'Search Response Body');
         const thereAreNoResults =
-          !searchResponseBody ||
+          !Array.isArray(searchResponseBody) ||
+          (searchResponseBody.length === 0 &&
+            result.entity.subtype !== 'custom.splunkSearch') ||
           (size(searchResponseBody) > 0 && !get('0.result', searchResponseBody));
 
         return {
@@ -130,14 +138,15 @@ const doLookup = (entities, options, cb) => {
                 details: {
                   results: searchResponseBody,
                   search: result.searchQuery,
-                  tags: _getSummaryTags(result.searchResponseBody, summaryFields)
+                  searchSyntaxErrors,
+                  tags: _getSummaryTags(searchResponseBody, summaryFields)
                 }
               }
         };
       })
     )(results);
 
-    Logger.debug({ lookupResults }, 'Results');
+    Logger.debug({ lookupResults }, 'Lookup Results');
     cb(null, lookupResults);
   });
 };
@@ -158,6 +167,45 @@ function _getSummaryTags(results, summaryFields) {
   });
 
   return Array.from(tags.values());
+}
+
+function onMessage(payload, options, cb) {
+  switch (payload.action) {
+    case 'SEARCH':
+      let search = payload.search.trim();
+      const entity = payload.entity;
+
+      // We want to make sure the search starts with the string `search`
+      if (!search.startsWith('search ')) {
+        search = 'search ' + search;
+      }
+
+      entity.value = search;
+      doLookup([entity], options, (err, lookupResults) => {
+        Logger.trace({ lookupResults }, 'onMessage Search Results');
+        if (err) {
+          return cb(err);
+        }
+
+        if (lookupResults.length > 0 && lookupResults[0].data !== null) {
+          return cb(null, lookupResults[0].data.details);
+        } else if(lookupResults.length > 0 && lookupResults[0].data === null){
+          //no results
+          return cb(null, lookupResults[0].data);
+        }
+
+        Logger.error(
+          { lookupResults },
+          'Unexpected onMessage lookupResults payload received'
+        );
+
+        cb({
+          detail: 'Unexpected lookup results',
+          lookupResults
+        });
+      });
+      break;
+  }
 }
 
 const validateOptions = async (options, callback) => {
@@ -188,5 +236,6 @@ const validateOptions = async (options, callback) => {
 module.exports = {
   doLookup,
   startup,
-  validateOptions
+  validateOptions,
+  onMessage
 };

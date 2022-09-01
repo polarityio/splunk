@@ -1,8 +1,61 @@
-{{#if (and block.userOptions.searchAppUrl details.search)}}
-    <div class="title-block">
-        <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}&earliest=0" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}&display.page.search.mode=smart&dispatch.sample_ratio=1&&earliest=0" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
-    </div>
+{{!-- General Error Messages --}}
+{{#if block._state.errorMessage}}
+  <div class="alert alert-danger error-container scrollable-container">
+    <div class="error-title">{{fa-icon "exclamation-circle"}} Splunk Search Error</div>
+    <div class="error-message">{{block._state.errorMessage}}</div>
+  </div>
 {{/if}}
+
+{{!-- Direct Search Syntax Errors --}}
+{{#if hasSearchSyntaxErrors}}
+  <div class="syntax-error-container">
+    <h1 class="p-title">{{fa-icon icon="exclamation-triangle" fixedWidth=true class="error-icon"}} Search Syntax Error</h1>
+    <div>
+      <span class="description">Your SPL query has a syntax error.  Modify the query and try running it again.</span>
+    </div>
+    {{#each details.searchSyntaxErrors as |syntaxError|}}
+      <pre class="search-error">{{syntaxError}}</pre>
+    {{/each}}
+  </div>
+{{/if}}
+
+{{!-- Direct Search TextArea --}}
+{{#if isDirectSearch}}
+  <div class="position-relative textarea-container">
+    {{textarea value=details.search rows=3 placeholder="Search query" class="search-textarea"}}
+    <div class="query-circuit-breaker-container">
+      <span>SPL Max Results: {{block.userOptions.directSearchMaxResults}}</span> |
+      <span>SPL Earliest: {{block.userOptions.directSearchMaxTimeframe}}</span>
+    </div>
+  </div>
+  <div class="d-flex flex-row justify-content-between align-items-center mt-1">
+    <div>
+      <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}&earliest=0" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}&display.page.search.mode=smart&dispatch.sample_ratio=1&&earliest=0" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
+    </div>
+    <button {{action "search"}} class="btn btn-polarity btn-sm">
+      {{#if block._state.searchRunning}}
+        {{fa-icon icon="spinner-third" spin=true fixedWidth=true class="icon"}}
+      {{else}}
+        {{fa-icon icon="search" fixedWidth=true class="icon"}}
+      {{/if}}
+       Search
+    </button>
+  </div>
+{{/if}}
+
+{{!-- Search in Splunk Link --}}
+{{#if (and block.userOptions.searchAppUrl details.search (not isDirectSearch))}}
+  <div class="title-block">
+    <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}&earliest=0" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}&display.page.search.mode=smart&dispatch.sample_ratio=1&&earliest=0" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
+  </div>
+{{/if}}
+
+{{!-- No Results Message --}}
+{{#if (and (eq details.results.length 0) (not hasSearchSyntaxErrors))}}
+  <h1 class="p-title">{{fa-icon icon="info-circle" fixedWidth=true class="icon"}} No Search Results</h1>
+{{/if}}
+
+{{!-- Search Results --}}
 {{#each details.results as |item index|}}
     <div class="result">
         <ul class="nav nav-tabs">

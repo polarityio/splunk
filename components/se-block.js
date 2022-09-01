@@ -3,16 +3,15 @@
 polarity.export = PolarityComponent.extend({
   details: Ember.computed.alias('block.data.details'),
   init() {
-    this.get('details.results').forEach((result, index) => {
-      this._initFields(index);
-      Ember.set(result, 'showFields', true);
-      Ember.set(result, 'showTable', false);
-      Ember.set(result, 'showJson', false);
-      Ember.set(result, 'showSource', false);
-    });
+    this.initializeBlock();
+
+    if(!this.get('block._state')){
+      this.set('block._state', {});
+    }
+
     this._super(...arguments);
   },
-  onDetailsOpened() {
+  initializeBlock(){
     this.get('details.results').forEach((result, index) => {
       this._initFields(index);
       Ember.set(result, 'showFields', true);
@@ -21,6 +20,12 @@ polarity.export = PolarityComponent.extend({
       Ember.set(result, 'showSource', false);
     });
   },
+  isDirectSearch: Ember.computed('block.entity.subtype', function(){
+    return this.get('block.entity.subtype') === 'custom.splunkSearch';
+  }),
+  hasSearchSyntaxErrors: Ember.computed('details.searchSyntaxErrors', function(){
+    return this.get('details.searchSyntaxErrors.length') > 0;
+  }),
   actions: {
     showFields: function(index) {
       this.set('details.results.' + index + '.showTable', false);
@@ -52,6 +57,25 @@ polarity.export = PolarityComponent.extend({
       this.set('details.results.' + index + '.showJson', false);
       this.set('details.results.' + index + '.showSource', true);
       this.set('details.results.' + index + '.showFields', false);
+    },
+    search: function(){
+      const payload = {
+        action: "SEARCH",
+        entity: this.get('block.entity'),
+        search: this.get('details.search')
+      }
+
+      this.set('block._state.searchRunning', true);
+      this.set('block._state.errorMessage', '');
+
+      this.sendIntegrationMessage(payload).then((details) => {
+        this.set('block.data.details', details);
+        this.initializeBlock();
+      }).catch((err) => {
+        this.set('block._state.errorMessage', JSON.stringify(err, null, 4));
+      }).finally(() => {
+        this.set('block._state.searchRunning', false);
+      })
     }
   },
   _initFields(index) {
