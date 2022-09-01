@@ -9,12 +9,12 @@
 {{!-- Direct Search Syntax Errors --}}
 {{#if hasSearchSyntaxErrors}}
   <div class="syntax-error-container">
-    <h1 class="p-title">{{fa-icon icon="exclamation-triangle" fixedWidth=true class="error-icon"}} Search Syntax Error</h1>
+    <h1 class="p-title">Search Syntax Error</h1>
     <div>
       <span class="description">Your SPL query has a syntax error.  Modify the query and try running it again.</span>
     </div>
     {{#each details.searchSyntaxErrors as |syntaxError|}}
-      <pre class="search-error">{{syntaxError}}</pre>
+      <pre class="search-error">{{fa-icon icon="exclamation-triangle" fixedWidth=true class="error-icon mr-1"}}{{syntaxError}}</pre>
     {{/each}}
   </div>
 {{/if}}
@@ -30,7 +30,13 @@
   </div>
   <div class="d-flex flex-row justify-content-between align-items-center mt-1">
     <div>
-      <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}&earliest=0" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}&display.page.search.mode=smart&dispatch.sample_ratio=1&&earliest=0" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
+      <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}&earliest=0" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}&display.page.search.mode=smart&dispatch.sample_ratio=1&&earliest=0" class="p-link">
+      {{#if hasSearchSyntaxErrors}}
+        Troubleshoot search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}
+      {{else}}
+        Run search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}
+      {{/if}}
+      </a>
     </div>
     <button {{action "search"}} class="btn btn-polarity btn-sm">
       {{#if block._state.searchRunning}}
@@ -50,9 +56,11 @@
   </div>
 {{/if}}
 
-{{!-- No Results Message --}}
+{{!-- No Result and Result Limit Message --}}
 {{#if (and (eq details.results.length 0) (not hasSearchSyntaxErrors))}}
   <h1 class="p-title">{{fa-icon icon="info-circle" fixedWidth=true class="icon"}} No Search Results</h1>
+{{else if (gte details.results.length block.userOptions.directSearchMaxResults)}}
+  <div class="p-footnote mt-1">Reached result limit of {{block.userOptions.directSearchMaxResults}}. Run search in Splunk to see all results.</div>
 {{/if}}
 
 {{!-- Search Results --}}

@@ -25,12 +25,17 @@ module.exports = {
   description:
     'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
   entityTypes: ['IPv4', 'IPv6', 'hash', 'email', 'domain'],
-  customTypes: [
-    {
-      key: 'splunkSearch',
-      regex: /^search [\s\S]{2,512}$/
-    }
-  ],
+  // customTypes: [
+  //   {
+  //     key: 'splunkSearch',
+  //     regex: /^search [\s\S]{2,512}$/
+  //   }
+  // ],
+  /**
+   * Uncomment the below line when enabled the custom `splunkSearch` entity type to ensure the integration
+   * only runs in onDemand mode.
+   */
+  //onDemandOnly: true,
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.

@@ -16,6 +16,12 @@ To use your Splunk Cloud deployment you must submit a case requesting access usi
 
 > https://docs.splunk.com/Documentation/Splunk/8.0.6/RESTTUT/RESTandCloud
 
+Splunk Cloud authentication currently uses basic authentication via a username and password.
+
+## SPL Queries
+
+The Splunk integration allows users to directly query Splunk using SPL queries.  To enable this feature, please uncomment the custom `splunkSearch` entity type from this integration's `config.js` file found in the `config/config.js` folder.  If the custom `splunkSearch` entity type is enabled, please ensure the integration is set to run in `onDemand Only` mode.
+
 ## Splunk Integration Options
 
 ### Splunk Cloud Deployment
@@ -133,6 +139,15 @@ To see a list of available collections to search, leave this field empty, check 
 A comma separated list of KV Store Collection Fields to search on. To see a list of available fields to search on, leave this field empty, check the "Search KV Store" option above, and set "KV Store Apps & Collections to Search" to your desired collections, then click "Apply Changes".
 > ***Note:*** Minimizing these will improve KV Store search times.
 > ***Note:*** You can also use these fields in the "Summary Fields" option above.
+
+
+### Earliest SPL Time Bounds
+
+Sets the earliest (inclusive) time bounds for the search when directly searching using a Splunk SPL query. This option only applies to SPL queries directly input by the user and does not limit the results returned by the `Splunk Search String` option. This option should be set to "Users can view only". Defaults to `-1mon`.
+
+### Maximum SPL Results
+
+The maximum number of results to return when directly searching using a Splunk SPL query. This option only applies to SPL queries directly input by the user and does not limit the results returned by the `Splunk Search String` option. This option should be set to "Users can view only". Defaults to 10.
 
  ## Installation Instructions
 

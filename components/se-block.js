@@ -85,6 +85,17 @@ polarity.export = PolarityComponent.extend({
       if (!key.startsWith('_')) {
         fields.push({ key: key, value: _source[key] });
       }
+      // Was testing unrolling the _raw field if it has JSON in it
+      // if(key === '_raw'){
+      //   try {
+      //     const rawData = JSON.parse(_source['_raw']);
+      //     for (let key in rawData) {
+      //       fields.push({key, value: rawData[key]});
+      //     }
+      //   } catch(e){
+      //
+      //   }
+      // }
     }
     this.set('details.results.' + index + '.fields', fields);
   },
