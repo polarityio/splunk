@@ -21,7 +21,7 @@ polarity.export = PolarityComponent.extend({
     });
   },
   isDirectSearch: Ember.computed('block.entity.subtype', function(){
-    return this.get('block.entity.subtype') === 'custom.splunkSearch';
+    return this.get('block.entity.types').includes('custom.splunkSearch');
   }),
   hasSearchSyntaxErrors: Ember.computed('details.searchSyntaxErrors', function(){
     return this.get('details.searchSyntaxErrors.length') > 0;
