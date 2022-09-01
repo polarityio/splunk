@@ -126,7 +126,7 @@ const doLookup = (entities, options, cb) => {
         const thereAreNoResults =
           !Array.isArray(searchResponseBody) ||
           (searchResponseBody.length === 0 &&
-            !result.entity.includes('custom.splunkSearch') ||
+            !result.entity.includes('custom.splunkSearch')) ||
           (size(searchResponseBody) > 0 && !get('0.result', searchResponseBody));
 
         return {
