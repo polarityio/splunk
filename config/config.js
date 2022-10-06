@@ -24,7 +24,7 @@ module.exports = {
    */
   description:
     'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
-  entityTypes: ['IPv4', 'IPv6', 'hash', 'email', 'domain'],
+  entityTypes: ['IPv4', 'IPv6', 'hash', 'email', 'domain', 'cve'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
@@ -91,7 +91,8 @@ module.exports = {
       key: 'isCloud',
       name: 'Splunk Cloud Deployment',
       description:
-        'If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specfied below to connect to a Splunk Enterprise deployment. (Please set this to admin only and user can view only.)',
+        'If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  ' +
+          'If left unchecked, the integration will leverage the API Token specified below to connect to a Splunk Enterprise deployment. This option should be set to "Only admins view and edit".',
       default: false,
       type: 'boolean',
       userCanEdit: false,
@@ -101,7 +102,7 @@ module.exports = {
       key: 'url',
       name: 'Base Splunk URL',
       description:
-        'The base URL for the Splunk REST API including the schema (i.e., https://) and port (e.g., https://mysplunk:8089)',
+        'The base URL for the Splunk REST API including the scheme (i.e., https://) and port (e.g., https://mysplunk:8089)',
       type: 'text',
       default: '',
       userCanEdit: false,
@@ -111,7 +112,7 @@ module.exports = {
       key: 'searchAppUrl',
       name: 'Splunk Search App URL',
       description:
-        'The URL for the Splunk Search App including schema (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
+        'The URL for the Splunk Search App including scheme (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
       type: 'text',
       default: '',
       userCanEdit: false,
@@ -151,13 +152,32 @@ module.exports = {
       key: 'searchString',
       name: 'Splunk Search String',
       description:
-        'Splunk Search String to execute. The string `{{ENTITY}}` will be replace by the looked up indicator. For example: index=logs value={{ENTITY}} | head 10',
-      default: '{{ENTITY}} | head 10',
+        'Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.',
+      default: 'index=main TERM({{ENTITY}}) | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: true
     },
-
+    {
+      key: 'doMetasearch',
+      name: 'Run Index Discovery Metasearch',
+      description:
+        'If enabled, the integration will run a metasearch that will return a list of indexes where the searched entity exists. This search will replace your `Splunk Search String` query.',
+      default: false,
+      type: 'boolean',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
+      key: 'earliestTimeBound',
+      name: 'Earliest Time Bounds',
+      description:
+        'Sets the earliest (inclusive) time bounds for the "Splunk Search String" or "Index Discovery Metasearch". If set, this option will override any time bounds set in the "Splunk Search String" option". Leave blank to only use time bounds set via the "Splunk Search String" option. This option should be set to "Users can view only".  Defaults to `-1mon`.',
+      default: '-1mon',
+      type: 'text',
+      userCanEdit: false,
+      adminOnly: false
+    },
     {
       key: 'summaryFields',
       name: 'Summary Fields',
@@ -178,7 +198,6 @@ module.exports = {
       userCanEdit: true,
       adminOnly: false
     },
-
     {
       key: 'searchKvStore',
       name: 'Search KV Store',

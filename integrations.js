@@ -129,6 +129,7 @@ const doLookup = (entities, options, cb) => {
                 details: {
                   results: searchResponseBody,
                   search: result.searchQuery,
+                  searchType: result.searchType,
                   tags: _getSummaryTags(result.searchResponseBody, summaryFields)
                 }
               }
@@ -160,6 +161,19 @@ function _getSummaryTags(results, summaryFields) {
 }
 
 const validateOptions = async (options, callback) => {
+  if(options.doMetasearch.value === true && options.searchKvStore.value === true){
+    return callback(null, [
+      {
+        key: 'searchKvStore',
+        message: 'Cannot enable the "Search KV Store" if the "Run index discovery metasearch" option is also enabled.'
+      },
+      {
+        key: 'doMetasearch',
+        message: 'Cannot enable the "Run index discovery metasearch" if the "Search KV Store" option is also enabled.'
+      }
+    ])
+  }
+
   const authOptionErrors = getAuthenticationOptionValidationErrors(options);
   if (size(authOptionErrors)) return callback(null, authOptionErrors);
 

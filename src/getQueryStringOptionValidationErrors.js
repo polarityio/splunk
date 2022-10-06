@@ -1,4 +1,4 @@
-const { flow, includes, get, getOr, keys, __, filter, find } = require('lodash/fp');
+const { flow, includes, get, getOr, keys, find } = require('lodash/fp');
 
 
 const getQueryStringOptionValidationErrors = async (options, doLookup) =>

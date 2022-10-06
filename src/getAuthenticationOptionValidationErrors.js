@@ -42,7 +42,9 @@ const getAuthenticationOptionValidationErrors = (options) => {
       }
     : [];
 
-  return stringValidationErrors.concat(urlValidationErrors).concat(isCloudValidationError)
+  return stringValidationErrors
+    .concat(urlValidationErrors)
+    .concat(isCloudValidationError);
 };
 
 const _validateStringOptions = (stringOptionsErrorMessages, options, otherErrors = []) =>
@@ -82,6 +84,5 @@ const _validateUrlOption = ({ value: url }, otherErrors = []) => {
 
   return otherErrors;
 };
-
 
 module.exports = getAuthenticationOptionValidationErrors;

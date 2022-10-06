@@ -1,27 +1,30 @@
 pre {
-  overflow-y: scroll;
-  overflow-x: hidden;
-  max-height: 500px;
-  padding: 5px;
-  margin-top: 5px;
   background-color: #fff;
   font-family: 'Lucida Console', Monaco, monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
-.view-event-block{
-  margin-bottom: 5px;
+.external-icon {
+  font-size: 8px;
+  margin-bottom: 1px;
 }
 
-.external-icon{
-  font-size: 9px;
-}
+.meta-search-result {
+  border: 1px solid #dee2e6;
+  border-bottom: none;
+  padding: 4px;
 
-div.error-block{
-  margin-bottom: 10px;
-}
+  &:first-child{
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
 
-span.highlight {
-  background-color: rgb(255, 255, 0);
+  &:last-child{
+    border-bottom: 1px solid #dee2e6;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
 }
 
 div.title-block {
@@ -30,10 +33,8 @@ div.title-block {
 
 div.fields-table {
   font-family: 'Lucida Console', Monaco, monospace;
-  font-size: 11px;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  max-height: 500px;
+  font-size: 10px;
+
   table {
     thead {
       display: none;
@@ -63,36 +64,48 @@ div.fields-table {
 }
 
 div.tab-container {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 500px;
   margin-top: 5px;
+  line-height: 1.4em;
+  resize: vertical;
+  padding-right: 5px;
+}
+
+.scrollable-container{
+  overflow-y: scroll;
+  overflow-x: hidden;
+  resize: vertical;
+  max-height: 500px;
+  line-height: 1.4em;
+  padding-right: 5px;
 }
 
 div.json-block {
   pre {
     white-space: pre-wrap;
   }
+
   .string {
     color: #d14;
   }
+
   .number {
     color: #008080;
   }
+
   .boolean {
     color: #008080;
   }
+
   .null {
     color: #008080;
   }
+
   .key {
     color: #333;
   }
-}
-
-div.scrollable-block {
-  overflow-y: scroll;
-  overflow-x: hidden;
-  resize: vertical;
-  min-height: 150px;
-  max-height: 500px;
 }
 
 div.fields-block {
@@ -116,14 +129,6 @@ div.fields-block {
     display: inline;
     word-break: break-all;
   }
-}
-
-.fields-table {
-  margin-bottom: 10px;
-}
-
-.highlight-entry {
-  margin-bottom: 10px;
 }
 
 div.result {

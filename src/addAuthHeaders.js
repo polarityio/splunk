@@ -1,8 +1,4 @@
-const addAuthHeaders = (
-  requestOptions,
-  options,
-  callback
-) => {
+const addAuthHeaders = (requestOptions, options, callback) => {
   if (options.isCloud) {
     requestOptions.auth = {
       username: options.username,
