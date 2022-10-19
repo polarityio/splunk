@@ -1,4 +1,4 @@
-const { get, getOr } = require('lodash/fp');
+const { flow, includes, get, getOr, keys, find } = require('lodash/fp');
 
 
 const getQueryStringOptionValidationErrors = async (options, doLookup) =>
@@ -18,6 +18,23 @@ const getQueryStringOptionValidationErrors = async (options, doLookup) =>
       true
     )
   );
+
+
+
+const CHECK_ERROR_BY_ERROR_MESSAGE = {
+  'read ECONNRESET': () => [
+    {
+      key: 'url',
+      message: `ECONNRESET - Server could not be reached.`
+    }
+  ],
+  'connect ECONNREFUSED': (error, options) => [
+    {
+      key: 'url',
+      message: `ECONNREFUSED - Server could not be reached.`
+    }
+  ]
+};
 
 const ERROR_CHECK_BY_STATUS_CODE = {
   400: (error) => {
@@ -53,7 +70,22 @@ const ERROR_CHECK_BY_STATUS_CODE = {
       key: 'isCloud',
       message: `Internal Splunk Error.  Make a change and try again`
     }
-  ]
+  ],
+  undefined: (error, options) =>
+    flow(
+      keys,
+      find((key) => includes(key, get('err.message', error))),
+      (key) => get(key, CHECK_ERROR_BY_ERROR_MESSAGE),
+      (func) =>
+        func
+          ? func(error, options)
+          : [
+              // {
+              //     key: 'url', // For Logging
+              //     message: JSON.stringify(error)
+              //   }
+            ]
+    )(CHECK_ERROR_BY_ERROR_MESSAGE)
 };
 
 module.exports = getQueryStringOptionValidationErrors;

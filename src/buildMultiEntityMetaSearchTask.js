@@ -7,9 +7,7 @@ const {
   get,
   toLower,
   trim,
-  includes,
   first,
-  filter,
   map,
   uniqWith,
   isEqual,
@@ -19,57 +17,35 @@ const {
 
 const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
-const { searchKvStoreAndAddToResults } = require('./getKvStoreQueryResults');
-const { buildMultiEntityMetaSearchTask } = require('./buildMultiEntityMetaSearchTask');
-
 const EXPECTED_QUERY_STATUS_CODES = [200, 404];
 
-const buildMultiEntityQueryTask =
-  (entityGroup, options, requestWithDefaults, Logger) => (done) => {
-    if (options.searchKvStore) {
-      searchKvStoreAndAddToResults(
-        entityGroup,
-        options,
-        requestWithDefaults,
-        done,
-        Logger
-      );
-    } else if (options.doMetasearch) {
-      buildMultiEntityMetaSearchTask(
-        entityGroup,
-        options,
-        requestWithDefaults,
-        Logger,
-        done
-      );
-    } else {
-      let requestOptions = {
-        method: 'GET',
-        uri: `${options.url}/services/search/jobs/export`,
-        qs: {
-          search: buildSearchString(entityGroup, options, Logger),
-          output_mode: 'json'
-        },
-        json: false
-      };
-
-      if (options.earliestTimeBound.length > 0) {
-        requestOptions.qs.earliest_time = options.earliestTimeBound;
-      }
-
-      requestWithDefaults(
-        requestOptions,
-        options,
-        handleStandardQueryResponse(
-          entityGroup,
-          options,
-          requestWithDefaults,
-          done,
-          Logger
-        )
-      );
-    }
+const buildMultiEntityMetaSearchTask = (
+  entityGroup,
+  options,
+  requestWithDefaults,
+  Logger,
+  done
+) => {
+  let requestOptions = {
+    method: 'GET',
+    uri: `${options.url}/services/search/jobs/export`,
+    qs: {
+      search: buildSearchString(entityGroup, options, Logger),
+      output_mode: 'json'
+    },
+    json: false
   };
+
+  if (options.earliestTimeBound.length > 0) {
+    requestOptions.qs.earliest_time = options.earliestTimeBound;
+  }
+
+  requestWithDefaults(
+    requestOptions,
+    options,
+    handleStandardQueryResponse(entityGroup, options, requestWithDefaults, done, Logger)
+  );
+};
 
 const handleStandardQueryResponse =
   (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
@@ -99,37 +75,33 @@ const handleStandardQueryResponse =
       entityGroup,
       options,
       res,
-      body
+      body,
+      Logger
     );
 
     done(null, taskResult);
   };
 
-const buildSearchString = (entityGroup, options, Logger) => {
-  const searchString = flow(get('searchString'), trim)(options);
-  const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
-    ? flow(replace(/search/i, ''), trim)(searchString)
-    : searchString;
+const createMetaSearch = (entityValue, options) => `    
+    | metasearch index=* TERM("${entityValue}") 
+    | dedup index, sourcetype    
+    | stats values(sourcetype) AS sourcetype by index    
+    | mvexpand sourcetype    
+    | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
+    | table index, sourcetype, entity
+`;
 
+const buildSearchString = (entityGroup, options, Logger) => {
   const fullMultiEntitySearchString = reduce(
     (agg, entity, index) =>
       index === 0
-        ? `search ${replace(
-            /{{ENTITY}}/gi,
-            flow(first, escapeQuotes)(entityGroup),
-            searchStringWithoutPrefix
-          )}`
-        : `${agg} | append [ search ${replace(
-            /{{ENTITY}}/gi,
-            escapeQuotes(entity),
-            searchStringWithoutPrefix
-          )}]`,
+        ? createMetaSearch(flow(first, escapeQuotes)(entityGroup), options)
+        : `${agg} | append [ ${createMetaSearch(escapeQuotes(entity), options)}]`,
     '',
     entityGroup
   );
 
-  Logger.trace({ fullMultiEntitySearchString }, 'Multi-entity search string');
-
+  Logger.trace({ fullMultiEntitySearchString }, 'Multi-entity meta search string');
   return fullMultiEntitySearchString;
 };
 
@@ -140,7 +112,7 @@ const buildSearchString = (entityGroup, options, Logger) => {
  */
 const escapeQuotes = flow(get('value'), replace(/(\r\n|\n|\r)/gm, ''), replace(/"/g, ''));
 
-const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => {
+const buildQueryResultFromResponseStatus = (entityGroup, options, res, body, Logger) => {
   const statusSuccess = get('statusCode', res) === 200;
 
   // Splunk returns newline delimited JSON objects.  As a result we need to
@@ -182,7 +154,7 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
           ? bodyResultsForThisEntity
           : null,
         searchQuery,
-        searchType: 'search'
+        searchType: 'meta'
       };
     }, entityGroup);
 
@@ -192,15 +164,15 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
   return successResult || emptyResult || [];
 };
 
-const getObjectsContainingString = (string, objs) =>
-  filter(
-    flow(
-      JSON.stringify,
-      replace(/[^\w]/g, ''),
-      toLower,
-      includes(flow(replace(/[^\w]/g, ''), toLower)(string))
-    ),
-    objs
-  );
+const getObjectsContainingString = (entityValue, objs) => {
+  return objs.filter((result) => {
+    if (result && result.result && result.result.entity) {
+      return result.result.entity.toLowerCase() === entityValue.toLowerCase();
+    }
+    return false;
+  });
+};
 
-module.exports = buildMultiEntityQueryTask;
+module.exports = {
+  buildMultiEntityMetaSearchTask
+};

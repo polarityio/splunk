@@ -26,22 +26,25 @@ const getAuthenticationOptionValidationErrors = (options) => {
 
   const urlValidationErrors = _validateUrlOption(options.url);
 
-  const isCloudValidationError =
-    options.isCloud.value && !(options.username.value && options.password.value)
+  const isCloudValidationError = options.isCloud.value
+    ? !(options.username.value && options.password.value)
       ? {
           key: 'isCloud',
           message:
             'If Checked, you are required to enter both a Splunk Cloud Username and a Splunk Cloud Password.'
         }
-      : !options.apiToken.value
-      ? {
-          key: 'isCloud',
-          message:
-            'If Not Checked, you are required to enter a Splunk Authentication Token.'
-        }
-      : [];
+      : []
+    : !options.apiToken.value
+    ? {
+        key: 'isCloud',
+        message:
+          'If Not Checked, you are required to enter a Splunk Authentication Token.'
+      }
+    : [];
 
-  return stringValidationErrors.concat(urlValidationErrors).concat(isCloudValidationError)
+  return stringValidationErrors
+    .concat(urlValidationErrors)
+    .concat(isCloudValidationError);
 };
 
 const _validateStringOptions = (stringOptionsErrorMessages, options, otherErrors = []) =>
@@ -81,6 +84,5 @@ const _validateUrlOption = ({ value: url }, otherErrors = []) => {
 
   return otherErrors;
 };
-
 
 module.exports = getAuthenticationOptionValidationErrors;

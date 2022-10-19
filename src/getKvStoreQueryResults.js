@@ -24,7 +24,6 @@ const {
 
 const async = require('async');
 
-
 const MAX_PARALLEL_LOOKUPS = 10;
 
 const searchKvStoreAndAddToResults = (
@@ -81,7 +80,8 @@ const searchKvStoreAndAddToResults = (
         return (
           size(kvStoreResultsForThisEntity) && {
             entity,
-            searchResponseBody: kvStoreResultsForThisEntity
+            searchResponseBody: kvStoreResultsForThisEntity,
+            searchType: 'kv'
           }
         );
       }, entityGroup)
