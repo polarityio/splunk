@@ -101,6 +101,7 @@ const buildSearchString = (entityGroup, options, Logger) => {
     entityGroup
   );
 
+  Logger.trace({ fullMultiEntitySearchString }, 'Multi-entity meta search string');
   return fullMultiEntitySearchString;
 };
 
