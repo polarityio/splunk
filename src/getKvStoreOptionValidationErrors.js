@@ -75,16 +75,6 @@ const checkForBadCollectionFormattingCase = flow(
         message: 'All Apps require Collections and vice versa.  You might be missing ":" somewhere.'
       }];
 
-    const appOrCollectionNameIncludesWhitespace = flow(
-      flatten,
-      some(includes(' '))
-    )(splitAppCollection);
-    if (appOrCollectionNameIncludesWhitespace)
-      return [{
-        key: 'kvStoreAppsAndCollections',
-        message: 'App and Collection names should not include whitespace'
-      }];
-
     const appOrCollectionNameIncludesQuotes = includes('"', appCollections);
     if (appOrCollectionNameIncludesQuotes)
       return [
