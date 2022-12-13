@@ -18,10 +18,6 @@ To use your Splunk Cloud deployment you must submit a case requesting REST API a
 
 ## Splunk Integration Options
 
-### Splunk Cloud Deployment
-
-If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment. If left unchecked, the integration will leverage the API Token specified below to connect to a Splunk Enterprise deployment. This option should be set to "Only admins view and edit".
-
 ### Base Splunk URL
 
 The base URL for the Splunk REST API including the scheme (i.e., https://) and port (e.g., https://mysplunk:8089)  The URL for the Splunk

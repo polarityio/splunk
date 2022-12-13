@@ -4,16 +4,16 @@ const reduce = require('lodash/fp/reduce').convert({ cap: false });
 const getAuthenticationOptionValidationErrors = (options) => {
   const stringOptionsErrorMessages = {
     url: 'You must provide a valid Splunk URL',
-    ...(options.isCloud.value
+    ...(options.username.value && options.password.value
       ? {
           username:
-            'You must provide your Splunk Cloud Username while Splunk Cloud Deployment is Checked',
+            'You must provide your Splunk Cloud Username if no api token is provided.',
           password:
-            'You must provide your Splunk Cloud Password while Splunk Cloud Deployment is Checked'
+            'You must provide your Splunk Cloud Password if no api token is provided.'
         }
       : {
           apiToken:
-            'You must provide a valid Splunk Authentication Token while Splunk Cloud Deployment is Unchecked'
+            'You must provide a valid Splunk api token if no username and password are provided.'
         }),
     searchString:
       'Must provide a valid Splunk Search String. Without a Splunk Search String, no results will ever be returned'
@@ -26,25 +26,7 @@ const getAuthenticationOptionValidationErrors = (options) => {
 
   const urlValidationErrors = _validateUrlOption(options.url);
 
-  const isCloudValidationError = options.isCloud.value
-    ? !(options.username.value && options.password.value)
-      ? {
-          key: 'isCloud',
-          message:
-            'If Checked, you are required to enter both a Splunk Cloud Username and a Splunk Cloud Password.'
-        }
-      : []
-    : !options.apiToken.value
-    ? {
-        key: 'isCloud',
-        message:
-          'If Not Checked, you are required to enter a Splunk Authentication Token.'
-      }
-    : [];
-
-  return stringValidationErrors
-    .concat(urlValidationErrors)
-    .concat(isCloudValidationError);
+  return stringValidationErrors.concat(urlValidationErrors);
 };
 
 const _validateStringOptions = (stringOptionsErrorMessages, options, otherErrors = []) =>

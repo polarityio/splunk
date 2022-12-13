@@ -77,7 +77,7 @@ module.exports = {
     rejectUnauthorized: true
   },
   logging: {
-    level: 'info' //trace, debug, info, warn, error, fatal
+    level: 'trace' //trace, debug, info, warn, error, fatal
   },
   /**
    * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
@@ -87,17 +87,6 @@ module.exports = {
    * @optional
    */
   options: [
-    {
-      key: 'isCloud',
-      name: 'Splunk Cloud Deployment',
-      description:
-        'If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  ' +
-          'If left unchecked, the integration will leverage the API Token specified below to connect to a Splunk Enterprise deployment. This option should be set to "Only admins view and edit".',
-      default: false,
-      type: 'boolean',
-      userCanEdit: false,
-      adminOnly: true
-    },
     {
       key: 'url',
       name: 'Base Splunk URL',
