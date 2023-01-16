@@ -109,9 +109,9 @@ module.exports = {
     },
     {
       key: 'username',
-      name: 'Splunk Cloud Username',
+      name: 'Splunk Username',
       description:
-        'Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.',
+        'Valid Splunk username.  Leave this field blank is authenticating via a Splunk Authentication Token.',
       type: 'text',
       default: '',
       userCanEdit: false,
@@ -119,9 +119,9 @@ module.exports = {
     },
     {
       key: 'password',
-      name: 'Splunk Cloud Password',
+      name: 'Splunk Password',
       description:
-        'Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.',
+        'Valid Splunk password corresponding to the username specified above. Leave this field blank is authenticating via a Splunk Authentication Token.',
       type: 'password',
       default: '',
       userCanEdit: false,

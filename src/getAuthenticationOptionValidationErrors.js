@@ -7,16 +7,16 @@ const getAuthenticationOptionValidationErrors = (options) => {
     ...(options.username.value && options.password.value
       ? {
           username:
-            'You must provide your Splunk Cloud Username if no api token is provided.',
+            'You must provide your Splunk Username if no API token is provided.',
           password:
-            'You must provide your Splunk Cloud Password if no api token is provided.'
+            'You must provide your Splunk Password if no API token is provided.'
         }
       : {
           apiToken:
             'You must provide a valid Splunk api token if no username and password are provided.'
         }),
     searchString:
-      'Must provide a valid Splunk Search String. Without a Splunk Search String, no results will ever be returned'
+      'You must provide a valid Splunk Search String. Without a Splunk Search String, no results will be returned'
   };
 
   const stringValidationErrors = _validateStringOptions(
