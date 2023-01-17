@@ -16,6 +16,8 @@ const {
   pick,
   size
 } = require('lodash/fp');
+const { getLogger } = require('./logger');
+const { parseErrorToReadableJSON } = require('./errors');
 
 const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
@@ -95,14 +97,24 @@ const handleStandardQueryResponse =
       return done(formattedError);
     }
 
-    const taskResult = buildQueryResultFromResponseStatus(
-      entityGroup,
-      options,
-      res,
-      body
-    );
-
-    done(null, taskResult);
+    try {
+      const taskResult = buildQueryResultFromResponseStatus(
+        entityGroup,
+        options,
+        res,
+        body
+      );
+      done(null, taskResult);
+    } catch (parserError) {
+      // It's possible for the `buildQueryResultFromResponseStatus method to have a JSON parsing error
+      // we need to try to catch that here and return an error when this happens.  We've seen this happen
+      // when a proxy is between the Polarity Server and Splunk and returns an HTML error page.
+      done({
+        detail: 'Error parsing search result',
+        body,
+        error: parseErrorToReadableJSON(parserError)
+      });
+    }
   };
 
 const buildSearchString = (entityGroup, options, Logger) => {
