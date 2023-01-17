@@ -8,7 +8,7 @@ Polarity's Splunk integration allows a user to connect and search a Splunk Enter
 
 ## Required: Enabling Token Authentication
 
-The Polarity-Splunk integration requires that Token Authentication be enabled on your Splunk Enterprise instance.  By default, token authentication is turned off for new installations of Splunk Enterprise. For directions on how to enable Token Authentication please see the following Splunk help page.
+The Polarity-Splunk integration works best with Token Authentication enabled on your Splunk Enterprise instance.  By default, token authentication is turned off for new installations of Splunk Enterprise. For directions on how to enable Token Authentication please see the following Splunk help page.
 
 > https://docs.splunk.com/Documentation/Splunk/9.0.1/Security/EnableTokenAuth
 
@@ -37,17 +37,17 @@ The URL for the Splunk Search App including schema (i.e., https://) and port (e.
 
 > It is important that this setting is set to "User can view only".  This is required so the option is available to non-admin users in their Overlay Window.
 
-### Splunk Cloud Username
+### Splunk Username
 
-Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.
+Valid Splunk username. Leave this field blank is authenticating via a Splunk Authentication Token.
 
-### Splunk Cloud Password
+### Splunk Password
 
-Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.
+Valid Splunk password corresponding to the username specified above. Leave this field blank is authenticating via a Splunk Authentication Token.
 
 ### Splunk Authentication Token
 
-A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens". If authenticating against a Splunk Cloud deployment, please leave this field blank.
+A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".
 
 ### Splunk Search String
 
