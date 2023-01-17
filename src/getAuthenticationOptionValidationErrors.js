@@ -6,18 +6,61 @@ const getAuthenticationOptionValidationErrors = (options) => {
     url: 'You must provide a valid Splunk URL',
     ...(options.username.value && options.password.value
       ? {
-          username:
-            'You must provide your Splunk Username if no API token is provided.',
-          password:
-            'You must provide your Splunk Password if no API token is provided.'
+          username: 'You must provide your Splunk Username if no API token is provided.',
+          password: 'You must provide your Splunk Password if no API token is provided.'
         }
       : {
           apiToken:
-            'You must provide a valid Splunk api token if no username and password are provided.'
+            'You must provide a valid Splunk api token if both a username and password are provided.'
         }),
     searchString:
       'You must provide a valid Splunk Search String. Without a Splunk Search String, no results will be returned'
   };
+
+  // if both a username or password and a API Token is provided, show validation on all fields so
+  // user knows they have to pick one or the other.
+  if (
+    (options.username.value.length > 0 || options.password.value.length > 0) &&
+    options.apiToken.value.length > 0
+  ) {
+    return [
+      {
+        key: 'apiToken',
+        message:
+          'You must provide either a username and password, or an API Token, but not both.'
+      },
+      {
+        key: 'username',
+        message:
+          'You must provide either a username and password, or an API Token, but not both.'
+      },
+      {
+        key: 'password',
+        message:
+          'You must provide either a username and password, or an API Token, but not both.'
+      }
+    ];
+  }
+
+  // If a username is provided but not password, show validation on password
+  if (options.username.value.length > 0 && !options.password.value.length > 0) {
+    return [
+      {
+        key: 'password',
+        message: 'You must provide a password for the given Splunk Username.'
+      }
+    ];
+  }
+
+  // If a password is provided but no username, show validation on username
+  if (options.password.value.length > 0 && !options.username.value.length > 0) {
+    return [
+      {
+        key: 'username',
+        message: 'You must provide username for the given Splunk Password.'
+      }
+    ];
+  }
 
   const stringValidationErrors = _validateStringOptions(
     stringOptionsErrorMessages,
