@@ -42,15 +42,6 @@
   },
   "options": [
     {
-      "key": "isCloud",
-      "name": "Splunk Cloud Deployment",
-      "description": "If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  If left unchecked, the integration will leverage the API Token specified below to connect to a Splunk Enterprise deployment. This option should be set to \"Only admins view and edit\".",
-      "default": false,
-      "type": "boolean",
-      "userCanEdit": false,
-      "adminOnly": true
-    },
-    {
       "key": "url",
       "name": "Base Splunk URL",
       "description": "The base URL for the Splunk REST API including the scheme (i.e., https://) and port (e.g., https://mysplunk:8089)",
@@ -70,8 +61,8 @@
     },
     {
       "key": "username",
-      "name": "Splunk Cloud Username",
-      "description": "Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.",
+      "name": "Splunk Username",
+      "description": "Valid Splunk username. Leave this field blank is authenticating via a Splunk Authentication Token.",
       "type": "text",
       "default": "",
       "userCanEdit": false,
@@ -79,8 +70,8 @@
     },
     {
       "key": "password",
-      "name": "Splunk Cloud Password",
-      "description": "Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.",
+      "name": "Splunk Password",
+      "description": "Valid Splunk password corresponding to the username specified above. Leave this field blank is authenticating via a Splunk Authentication Token.",
       "type": "password",
       "default": "",
       "userCanEdit": false,
@@ -89,7 +80,7 @@
     {
       "key": "apiToken",
       "name": "Splunk Authentication Token",
-      "description": "A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to \"Settings -> Tokens\".  If authenticating against a Splunk Cloud deployment, please leave this field blank.",
+      "description": "A Splunk Authentication Token which can be created from the Splunk web interface by going to \"Settings -> Tokens\".",
       "default": "",
       "type": "password",
       "userCanEdit": false,

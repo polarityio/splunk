@@ -131,7 +131,7 @@ module.exports = {
       key: 'apiToken',
       name: 'Splunk Authentication Token',
       description:
-        'A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".  If authenticating against a Splunk Cloud deployment, please leave this field blank.',
+        'A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".',
       default: '',
       type: 'password',
       userCanEdit: false,
