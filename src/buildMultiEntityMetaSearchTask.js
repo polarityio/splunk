@@ -86,7 +86,7 @@ const handleStandardQueryResponse =
       // we need to try to catch that here and return an error when this happens.  We've seen this happen
       // when a proxy is between the Polarity Server and Splunk and returns an HTML error page.
       done({
-        detail: 'Error parsing meta search result',
+        detail: 'Error JSON parsing meta search result',
         body,
         error: parseErrorToReadableJSON(parserError)
       });
