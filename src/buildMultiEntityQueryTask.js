@@ -208,7 +208,7 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
           ? bodyResultsForThisEntity
           : null,
         searchQuery,
-        searchAppQuery,
+        searchAppQuery: searchAppQueryString.length === 0 ? searchQuery : searchAppQuery,
         searchType: 'search'
       };
     }, entityGroup);

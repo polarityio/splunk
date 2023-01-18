@@ -25,6 +25,7 @@ module.exports = {
   description:
     'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
   entityTypes: ['IPv4', 'IPv6', 'hash', 'email', 'domain', 'cve'],
+  defaultColor: 'light-gray',
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
@@ -79,6 +80,7 @@ module.exports = {
   logging: {
     level: 'info' //trace, debug, info, warn, error, fatal
   },
+  copyOnDemand: true,
   /**
    * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
    * as an array of option objects.
@@ -142,7 +144,7 @@ module.exports = {
       name: 'Splunk Search String',
       description:
         'Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.',
-      default: 'index=main TERM({{ENTITY}}) | head 10',
+      default: 'index=main {{ENTITY}} | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: true
@@ -151,8 +153,8 @@ module.exports = {
       key: 'searchAppQueryString',
       name: 'Splunk Search App Query',
       description:
-          'The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the "Splunk Search String" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.  This option should be set to "Users can view only".',
-      default: 'index=main TERM({{ENTITY}}) | head 10',
+          'The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the "Splunk Search String" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10. If left blank the "Splunk Search String" option value will be used.',
+      default: 'index=main {{ENTITY}} | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: false

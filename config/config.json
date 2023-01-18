@@ -10,6 +10,7 @@
     "domain",
     "cve"
   ],
+  "defaultColor": "light-gray",
   "styles": [
     "./styles/se.less"
   ],
@@ -98,7 +99,7 @@
     {
       "key": "searchAppQueryString",
       "name": "Splunk Search App Query",
-      "description": "The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the \"Splunk Search String\" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.  This option should be set to \"Users can view only\".",
+      "description": "The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the \"Splunk Search String\" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10. If left blank the \"Splunk Search String\" option value will be used.",
       "default": "index=main TERM({{ENTITY}}) | head 10",
       "type": "text",
       "userCanEdit": false,
