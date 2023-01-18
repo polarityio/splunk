@@ -129,6 +129,7 @@ const doLookup = (entities, options, cb) => {
                 details: {
                   results: searchResponseBody,
                   search: result.searchQuery,
+                  searchAppQuery: result.searchAppQuery,
                   searchType: result.searchType,
                   tags: _getSummaryTags(result.searchResponseBody, summaryFields)
                 }

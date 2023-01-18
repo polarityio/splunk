@@ -101,11 +101,11 @@ module.exports = {
       key: 'searchAppUrl',
       name: 'Splunk Search App URL',
       description:
-        'The URL for the Splunk Search App including scheme (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
+        'The URL for the Splunk Search App including scheme (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").  This option should be set to "Users can view only".',
       type: 'text',
       default: '',
       userCanEdit: false,
-      adminOnly: true
+      adminOnly: false
     },
     {
       key: 'username',
@@ -148,6 +148,16 @@ module.exports = {
       adminOnly: true
     },
     {
+      key: 'searchAppQueryString',
+      name: 'Splunk Search App Query',
+      description:
+          'The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the "Splunk Search String" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.  This option should be set to "Users can view only".',
+      default: 'index=main TERM({{ENTITY}}) | head 10',
+      type: 'text',
+      userCanEdit: false,
+      adminOnly: false
+    },
+    {
       key: 'doMetasearch',
       name: 'Run Index Discovery Metasearch',
       description:
@@ -161,7 +171,7 @@ module.exports = {
       key: 'earliestTimeBound',
       name: 'Earliest Time Bounds',
       description:
-        'Sets the earliest (inclusive) time bounds for the "Splunk Search String" or "Index Discovery Metasearch". If set, this option will override any time bounds set in the "Splunk Search String" option". Leave blank to only use time bounds set via the "Splunk Search String" option. This option should be set to "Users can view only".  Defaults to `-1mon`.',
+        'Sets the earliest (inclusive) time bounds for the "Splunk Search String", "Splunk Search App Query", and "Index Discovery Metasearch". If set, this option will override any time bounds set in the "Splunk Search String" option". Leave blank to only use time bounds set via the "Splunk Search String" option. This option should be set to "Users can view only".  Defaults to `-1mon`.',
       default: '-1mon',
       type: 'text',
       userCanEdit: false,
