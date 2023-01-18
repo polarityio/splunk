@@ -33,9 +33,9 @@
     {{/each}}
   </div>
 {{else}}
-  {{#if (and block.userOptions.searchAppUrl details.search)}}
+  {{#if (and block.userOptions.searchAppUrl details.searchAppQuery)}}
     <div class="title-block">
-      <a href="{{block.userOptions.searchAppUrl}}?q={{details.search}}&earliest={{block.userOptions.earliestTimeBound}}" title="{{block.userOptions.searchAppUrl}}?q={{details.search}}&display.page.search.mode=smart&dispatch.sample_ratio=1&&earliest=0" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
+      <a href="{{block.userOptions.searchAppUrl}}?q={{details.searchAppQuery}}&earliest={{block.userOptions.earliestTimeBound}}" title="{{block.userOptions.searchAppUrl}}?q={{details.searchAppQuery}}&display.page.search.mode=smart&dispatch.sample_ratio=1&&earliest=0" class="p-link">Run Search in Splunk {{fa-icon "external-link" fixedWidth=true class="external-icon"}}</a>
     </div>
   {{/if}}
   {{#if block.userOptions.earliestTimeBound}}

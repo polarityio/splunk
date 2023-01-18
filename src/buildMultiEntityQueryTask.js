@@ -177,15 +177,29 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
       );
 
       const searchString = flow(get('searchString'), trim)(options);
+      const searchAppQueryString = flow(get('searchAppQueryString'), trim)(options);
 
       const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
         ? flow(replace(/search/i, ''), trim)(searchString)
         : searchString;
 
+      const searchAppQueryStringWithoutPrefix = flow(
+        toLower,
+        startsWith('search')
+      )(searchAppQueryString)
+        ? flow(replace(/search/i, ''), trim)(searchAppQueryString)
+        : searchAppQueryString;
+
       const searchQuery = `search ${replace(
         /{{ENTITY}}/gi,
         escapeQuotes(entity),
         searchStringWithoutPrefix
+      )}`;
+
+      const searchAppQuery = `search ${replace(
+        /{{ENTITY}}/gi,
+        escapeQuotes(entity),
+        searchAppQueryStringWithoutPrefix
       )}`;
 
       return {
@@ -194,6 +208,7 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
           ? bodyResultsForThisEntity
           : null,
         searchQuery,
+        searchAppQuery: searchAppQueryString.length === 0 ? searchQuery : searchAppQuery,
         searchType: 'search'
       };
     }, entityGroup);
