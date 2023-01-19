@@ -144,7 +144,7 @@ module.exports = {
       name: 'Splunk Search String',
       description:
         'Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.',
-      default: 'index=main {{ENTITY}} | head 10',
+      default: 'index=main "{{ENTITY}}" | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: true
@@ -154,7 +154,7 @@ module.exports = {
       name: 'Splunk Search App Query',
       description:
           'The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the "Splunk Search String" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10. If left blank the "Splunk Search String" option value will be used.',
-      default: 'index=main {{ENTITY}} | head 10',
+      default: 'index=main "{{ENTITY}}" | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: false
