@@ -1,5 +1,5 @@
 const addAuthHeaders = (requestOptions, options, callback) => {
-  if (options.isCloud) {
+  if (options.username && options.password) {
     requestOptions.auth = {
       username: options.username,
       password: options.password

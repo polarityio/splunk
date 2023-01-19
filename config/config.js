@@ -25,6 +25,7 @@ module.exports = {
   description:
     'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
   entityTypes: ['IPv4', 'IPv6', 'hash', 'email', 'domain', 'cve'],
+  defaultColor: 'light-gray',
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
@@ -79,6 +80,7 @@ module.exports = {
   logging: {
     level: 'info' //trace, debug, info, warn, error, fatal
   },
+  copyOnDemand: true,
   /**
    * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
    * as an array of option objects.
@@ -87,17 +89,6 @@ module.exports = {
    * @optional
    */
   options: [
-    {
-      key: 'isCloud',
-      name: 'Splunk Cloud Deployment',
-      description:
-        'If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment.  ' +
-          'If left unchecked, the integration will leverage the API Token specified below to connect to a Splunk Enterprise deployment. This option should be set to "Only admins view and edit".',
-      default: false,
-      type: 'boolean',
-      userCanEdit: false,
-      adminOnly: true
-    },
     {
       key: 'url',
       name: 'Base Splunk URL',
@@ -112,17 +103,17 @@ module.exports = {
       key: 'searchAppUrl',
       name: 'Splunk Search App URL',
       description:
-        'The URL for the Splunk Search App including scheme (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").',
+        'The URL for the Splunk Search App including scheme (i.e., https://) and port (e.g., https://mysplunk:9000/en-US/app/search/search). This option must be set to "User can view only" (rather than "Only admins can view and edit").  This option should be set to "Users can view only".',
       type: 'text',
       default: '',
       userCanEdit: false,
-      adminOnly: true
+      adminOnly: false
     },
     {
       key: 'username',
-      name: 'Splunk Cloud Username',
+      name: 'Splunk Username',
       description:
-        'Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.',
+        'Valid Splunk username.  Leave this field blank is authenticating via a Splunk Authentication Token.',
       type: 'text',
       default: '',
       userCanEdit: false,
@@ -130,9 +121,9 @@ module.exports = {
     },
     {
       key: 'password',
-      name: 'Splunk Cloud Password',
+      name: 'Splunk Password',
       description:
-        'Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.',
+        'Valid Splunk password corresponding to the username specified above. Leave this field blank is authenticating via a Splunk Authentication Token.',
       type: 'password',
       default: '',
       userCanEdit: false,
@@ -142,7 +133,7 @@ module.exports = {
       key: 'apiToken',
       name: 'Splunk Authentication Token',
       description:
-        'A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".  If authenticating against a Splunk Cloud deployment, please leave this field blank.',
+        'A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".',
       default: '',
       type: 'password',
       userCanEdit: false,
@@ -153,16 +144,26 @@ module.exports = {
       name: 'Splunk Search String',
       description:
         'Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.',
-      default: 'index=main TERM({{ENTITY}}) | head 10',
+      default: 'index=main {{ENTITY}} | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: true
     },
     {
-      key: 'doMetasearch',
-      name: 'Run Index Discovery Metasearch',
+      key: 'searchAppQueryString',
+      name: 'Splunk Search App Query',
       description:
-        'If enabled, the integration will run a metasearch that will return a list of indexes where the searched entity exists. This search will replace your `Splunk Search String` query.',
+          'The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the "Splunk Search String" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10. If left blank the "Splunk Search String" option value will be used.',
+      default: 'index=main {{ENTITY}} | head 10',
+      type: 'text',
+      userCanEdit: false,
+      adminOnly: false
+    },
+    {
+      key: 'doMetasearch',
+      name: 'Run Index Discovery Term Metasearch',
+      description:
+        'If enabled, the integration will run a TERM metasearch that will return a list of indexes where the searched entity exists. This search will replace your `Splunk Search String` query.  The Index Discovery Search can only discover indexed entities.',
       default: false,
       type: 'boolean',
       userCanEdit: false,
@@ -172,7 +173,7 @@ module.exports = {
       key: 'earliestTimeBound',
       name: 'Earliest Time Bounds',
       description:
-        'Sets the earliest (inclusive) time bounds for the "Splunk Search String" or "Index Discovery Metasearch". If set, this option will override any time bounds set in the "Splunk Search String" option". Leave blank to only use time bounds set via the "Splunk Search String" option. This option should be set to "Users can view only".  Defaults to `-1mon`.',
+        'Sets the earliest (inclusive) time bounds for the "Splunk Search String", "Splunk Search App Query", and "Index Discovery Metasearch". If set, this option will override any time bounds set in the "Splunk Search String" option". Leave blank to only use time bounds set via the "Splunk Search String" option. This option should be set to "Users can view only".  Defaults to `-1mon`.',
       default: '-1mon',
       type: 'text',
       userCanEdit: false,

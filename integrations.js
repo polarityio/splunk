@@ -12,6 +12,7 @@ const getQueryStringOptionValidationErrors = require('./src/getQueryStringOption
 const getKvStoreOptionValidationErrors = require('./src/getKvStoreOptionValidationErrors');
 const buildMultiEntityQueryTask = require('./src/buildMultiEntityQueryTask');
 const addAuthHeaders = require('./src/addAuthHeaders');
+const { setLogger } = require('./src/logger');
 
 const tokenCache = new NodeCache({
   stdTTL: 5 * 60
@@ -31,6 +32,7 @@ const MAX_PARALLEL_LOOKUPS = 10;
 function startup(logger) {
   let defaults = {};
   Logger = logger;
+  setLogger(Logger);
 
   if (typeof config.request.cert === 'string' && config.request.cert.length > 0) {
     defaults.cert = fs.readFileSync(config.request.cert);
@@ -62,18 +64,16 @@ function startup(logger) {
   const startingRequestWithDefaults = request.defaults(defaults);
 
   requestWithDefaults = (requestOptions, options, callback) =>
-    addAuthHeaders(
-      requestOptions,
-      options,
-      (err, requestOptionsWithAuth) => {
-        if (err) return callback({
+    addAuthHeaders(requestOptions, options, (err, requestOptionsWithAuth) => {
+      if (err) {
+        return callback({
           ...JSON.parse(JSON.stringify(err, Object.getOwnPropertyNames(err))),
           isAuthError: true
         });
-
-        startingRequestWithDefaults(requestOptionsWithAuth, callback);
       }
-    );
+
+      startingRequestWithDefaults(requestOptionsWithAuth, callback);
+    });
 }
 
 const doLookup = (entities, options, cb) => {
@@ -89,7 +89,7 @@ const doLookup = (entities, options, cb) => {
 
   async.parallelLimit(tasks, MAX_PARALLEL_LOOKUPS, (err, results) => {
     if (err) {
-      Logger.error({ err: err }, 'Error');
+      Logger.error({ err: err }, 'Error Running Queries');
       cb(err);
       return;
     }
@@ -129,6 +129,7 @@ const doLookup = (entities, options, cb) => {
                 details: {
                   results: searchResponseBody,
                   search: result.searchQuery,
+                  searchAppQuery: result.searchAppQuery,
                   searchType: result.searchType,
                   tags: _getSummaryTags(result.searchResponseBody, summaryFields)
                 }
@@ -161,17 +162,19 @@ function _getSummaryTags(results, summaryFields) {
 }
 
 const validateOptions = async (options, callback) => {
-  if(options.doMetasearch.value === true && options.searchKvStore.value === true){
+  if (options.doMetasearch.value === true && options.searchKvStore.value === true) {
     return callback(null, [
       {
         key: 'searchKvStore',
-        message: 'Cannot enable the "Search KV Store" if the "Run index discovery metasearch" option is also enabled.'
+        message:
+          'Cannot enable the "Search KV Store" if the "Run index discovery metasearch" option is also enabled.'
       },
       {
         key: 'doMetasearch',
-        message: 'Cannot enable the "Run index discovery metasearch" if the "Search KV Store" option is also enabled.'
+        message:
+          'Cannot enable the "Run index discovery metasearch" if the "Search KV Store" option is also enabled.'
       }
-    ])
+    ]);
   }
 
   const authOptionErrors = getAuthenticationOptionValidationErrors(options);

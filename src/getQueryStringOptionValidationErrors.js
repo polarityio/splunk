@@ -1,9 +1,11 @@
 const { flow, includes, get, getOr, keys, find } = require('lodash/fp');
 
-
-const getQueryStringOptionValidationErrors = async (options, doLookup) =>
+const getQueryStringOptionValidationErrors = async (options, doLookup) => {
+  // Override the `earliestTimeBound` option so that this query which is meant to just test the
+  // auth runs quickly no matter what.
+  options.earliestTimeBound = '-1s'; // search back 1 second
   // Checking the Search String Option for Parsing Issues on User Option Splunk Auth Credentials
-  new Promise((res, rej) =>
+  return new Promise((res, rej) =>
     doLookup(
       [{ value: '8.8.8.8', type: 'IPv4' }],
       options,
@@ -18,8 +20,7 @@ const getQueryStringOptionValidationErrors = async (options, doLookup) =>
       true
     )
   );
-
-
+};
 
 const CHECK_ERROR_BY_ERROR_MESSAGE = {
   'read ECONNRESET': () => [
@@ -53,24 +54,69 @@ const ERROR_CHECK_BY_STATUS_CODE = {
       );
     } catch (_) {}
   },
-  401: (error, options) => [
-    {
-      key: options.isCloud ? 'isCloud' : 'apiToken',
-      message: `Authentication Failed when tried with Splunk.`
+  401: (error, options) => {
+    if (options.apiToken) {
+      return [
+        {
+          key: 'apiToken',
+          message: `Error authenticating to Splunk: Invalid API Token.`
+        }
+      ];
+    } else {
+      return [
+        {
+          key: 'username',
+          message: `Error authenticating to Splunk: Invalid username or password.`
+        },
+        {
+          key: 'password',
+          message: `Error authenticating to Splunk: Invalid username or password.`
+        }
+      ];
     }
-  ],
-  403: (error, options) => [
-    {
-      key: options.isCloud ? 'isCloud' : 'apiToken',
-      message: `Authentication Failed when tried with Splunk: Insufficient Permission.`
+  },
+  403: (error, options) => {
+    if (options.apiToken) {
+      return [
+        {
+          key: 'apiToken',
+          message: `Error authenticating to Splunk: Insufficient Permission.`
+        }
+      ];
+    } else {
+      return [
+        {
+          key: 'username',
+          message: `Error authenticating to Splunk: Insufficient Permission.`
+        },
+        {
+          key: 'password',
+          message: `Error authenticating to Splunk: Insufficient Permission.`
+        }
+      ];
     }
-  ],
-  500: () => [
-    {
-      key: 'isCloud',
-      message: `Internal Splunk Error.  Make a change and try again`
+  },
+  500: () => {
+    if (options.apiToken) {
+      return [
+        {
+          key: 'apiToken',
+          message: `Error authenticating to Splunk: Internal Splunk Error (500).`
+        }
+      ];
+    } else {
+      return [
+        {
+          key: 'username',
+          message: `Error authenticating to Splunk: Internal Splunk Error (500).`
+        },
+        {
+          key: 'password',
+          message: `Error authenticating to Splunk: Internal Splunk Error (500).`
+        }
+      ];
     }
-  ],
+  },
   undefined: (error, options) =>
     flow(
       keys,

@@ -16,6 +16,8 @@ const {
   pick,
   size
 } = require('lodash/fp');
+const { getLogger } = require('./logger');
+const { parseErrorToReadableJSON } = require('./errors');
 
 const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
@@ -95,14 +97,24 @@ const handleStandardQueryResponse =
       return done(formattedError);
     }
 
-    const taskResult = buildQueryResultFromResponseStatus(
-      entityGroup,
-      options,
-      res,
-      body
-    );
-
-    done(null, taskResult);
+    try {
+      const taskResult = buildQueryResultFromResponseStatus(
+        entityGroup,
+        options,
+        res,
+        body
+      );
+      done(null, taskResult);
+    } catch (parserError) {
+      // It's possible for the `buildQueryResultFromResponseStatus method to have a JSON parsing error
+      // we need to try to catch that here and return an error when this happens.  We've seen this happen
+      // when a proxy is between the Polarity Server and Splunk and returns an HTML error page.
+      done({
+        detail: 'Error JSON parsing search result',
+        body,
+        error: parseErrorToReadableJSON(parserError)
+      });
+    }
   };
 
 const buildSearchString = (entityGroup, options, Logger) => {
@@ -165,15 +177,29 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
       );
 
       const searchString = flow(get('searchString'), trim)(options);
+      const searchAppQueryString = flow(get('searchAppQueryString'), trim)(options);
 
       const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
         ? flow(replace(/search/i, ''), trim)(searchString)
         : searchString;
 
+      const searchAppQueryStringWithoutPrefix = flow(
+        toLower,
+        startsWith('search')
+      )(searchAppQueryString)
+        ? flow(replace(/search/i, ''), trim)(searchAppQueryString)
+        : searchAppQueryString;
+
       const searchQuery = `search ${replace(
         /{{ENTITY}}/gi,
         escapeQuotes(entity),
         searchStringWithoutPrefix
+      )}`;
+
+      const searchAppQuery = `search ${replace(
+        /{{ENTITY}}/gi,
+        escapeQuotes(entity),
+        searchAppQueryStringWithoutPrefix
       )}`;
 
       return {
@@ -182,6 +208,7 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
           ? bodyResultsForThisEntity
           : null,
         searchQuery,
+        searchAppQuery: searchAppQueryString.length === 0 ? searchQuery : searchAppQuery,
         searchType: 'search'
       };
     }, entityGroup);

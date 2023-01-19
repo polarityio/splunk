@@ -1,8 +1,8 @@
 {
-  "main": "./integrations.js",
   "name": "Splunk",
+  "version": "3.5.0",
+  "main": "./integrations.js",
   "description": "Splunk Query Engine",
-  "version": "3.3.2",
   "private": true,
   "dependencies": {
     "async": "^3.2.4",

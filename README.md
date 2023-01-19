@@ -8,7 +8,7 @@ Polarity's Splunk integration allows a user to connect and search a Splunk Enter
 
 ## Required: Enabling Token Authentication
 
-The Polarity-Splunk integration requires that Token Authentication be enabled on your Splunk Enterprise instance.  By default, token authentication is turned off for new installations of Splunk Enterprise. For directions on how to enable Token Authentication please see the following Splunk help page.
+The Polarity-Splunk integration works best with Token Authentication enabled on your Splunk Enterprise instance.  By default, token authentication is turned off for new installations of Splunk Enterprise. For directions on how to enable Token Authentication please see the following Splunk help page.
 
 > https://docs.splunk.com/Documentation/Splunk/9.0.1/Security/EnableTokenAuth
 
@@ -17,10 +17,6 @@ To use your Splunk Cloud deployment you must submit a case requesting REST API a
 > https://docs.splunk.com/Documentation/Splunk/9.0.1/RESTTUT/RESTandCloud
 
 ## Splunk Integration Options
-
-### Splunk Cloud Deployment
-
-If checked, the integration will leverage the username/password specified below for authentication to a Splunk Cloud deployment. If left unchecked, the integration will leverage the API Token specified below to connect to a Splunk Enterprise deployment. This option should be set to "Only admins view and edit".
 
 ### Base Splunk URL
 
@@ -41,17 +37,17 @@ The URL for the Splunk Search App including schema (i.e., https://) and port (e.
 
 > It is important that this setting is set to "User can view only".  This is required so the option is available to non-admin users in their Overlay Window.
 
-### Splunk Cloud Username
+### Splunk Username
 
-Valid Splunk Cloud username.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.
+Valid Splunk username. Leave this field blank is authenticating via a Splunk Authentication Token.
 
-### Splunk Cloud Password
+### Splunk Password
 
-Valid Splunk Cloud password corresponding to the username specified above.  If authenticating against a Splunk Enterprise deployment, please leave this field blank.
+Valid Splunk password corresponding to the username specified above. Leave this field blank is authenticating via a Splunk Authentication Token.
 
 ### Splunk Authentication Token
 
-A Splunk Enterprise Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens". If authenticating against a Splunk Cloud deployment, please leave this field blank.
+A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".
 
 ### Splunk Search String
 
@@ -63,7 +59,27 @@ For example, to search the `mainIndex` you might use a query like this:
 search index=mainIndex indicator=TERM({{ENTITY}})
 ```
 
-Note the use of the `TERM` directive which is important when searching on entities such as IP addresses and provides a significant performance improvement.
+Note the use of the `TERM` directive can allow for more efficient searching of indicators such as IP addresses.
+
+The TERM directive can be used to speed up your search when the entity to search meets the following conditions:
+
+* The entity contains minor breakers, such as periods or underscores (e.g., the periods in an IP address)
+* The entity is bound by major breakers in the data (i.e., spaces, commas, semicolons, question marks, parentheses, exclamation points, and quotation marks)
+* The entity does not contain major breakers
+
+As an example of where the TERM directive will not work is if your data has the following format:
+
+```
+src=8.8.8.8 
+```
+
+In this example, the equal (=) symbol is a minor breaker (as opposed to a major breaker).  Since the IP address `8.8.8.8` is not bound or surrounded by major breakers, the IP `8.8.8.8` is not indexed and will not be found by the TERM search `TERM("8.8.8.8")`.
+
+One way to work around this is to more specifically specify your term in the Splunk Search String.  For example, to find the above example you could do the following:
+
+```
+search index=mainIndex TERM({{ENTITY}}) OR TERM("src={{ENTITY}}") 
+```
 
 For more information on the TERM directive see the Splunk documentation here: https://docs.splunk.com/Documentation/SplunkCloud/latest/Search/UseCASEandTERMtomatchphrases
 
@@ -124,6 +140,8 @@ The exact query run by the integration is as follows:
 | eval index=index, sourcetype=sourcetype
 | table index, sourcetype
 ```
+
+Note that this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. 
 
 For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The prepopulated search has the form:
 
