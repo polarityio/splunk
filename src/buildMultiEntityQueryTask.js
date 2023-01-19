@@ -28,7 +28,7 @@ const EXPECTED_QUERY_STATUS_CODES = [200, 404];
 
 const buildMultiEntityQueryTask =
   (entityGroup, options, requestWithDefaults, Logger) => (done) => {
-    if (options.searchKvStore) {
+    if (options.searchType.value === 'searchKvStore') {
       searchKvStoreAndAddToResults(
         entityGroup,
         options,
@@ -36,7 +36,10 @@ const buildMultiEntityQueryTask =
         done,
         Logger
       );
-    } else if (options.doMetasearch) {
+    } else if (
+      options.searchType.value === 'metaSearch' ||
+      options.searchType.value === 'metaSearchTerm'
+    ) {
       buildMultiEntityMetaSearchTask(
         entityGroup,
         options,

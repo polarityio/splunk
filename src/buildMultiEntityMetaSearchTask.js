@@ -32,7 +32,8 @@ const buildMultiEntityMetaSearchTask = (
     uri: `${options.url}/services/search/jobs/export`,
     qs: {
       search: buildSearchString(entityGroup, options, Logger),
-      output_mode: 'json'
+      output_mode: 'json',
+      adhoc_search_level: 'fast'
     },
     json: false
   };
@@ -93,14 +94,23 @@ const handleStandardQueryResponse =
     }
   };
 
-const createMetaSearch = (entityValue, options) => `    
-    | metasearch index=* TERM("${entityValue}") 
-    | dedup index, sourcetype    
-    | stats values(sourcetype) AS sourcetype by index    
-    | mvexpand sourcetype    
-    | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
-    | table index, sourcetype, entity
-`;
+const createMetaSearch = (entityValue, options) => {
+  if (options.searchType.value === 'metaSearchTerm') {
+    return `| metasearch index=* TERM("${entityValue}") 
+     | dedup index, sourcetype    
+     | stats values(sourcetype) AS sourcetype by index    
+     | mvexpand sourcetype    
+     | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
+     | table index, sourcetype, entity`;
+  } else {
+    return `search index=* "${entityValue}" 
+     | dedup index, sourcetype    
+     | stats values(sourcetype) AS sourcetype by index    
+     | mvexpand sourcetype    
+     | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
+     | table index, sourcetype, entity`;
+  }
+};
 
 const buildSearchString = (entityGroup, options, Logger) => {
   const fullMultiEntitySearchString = reduce(

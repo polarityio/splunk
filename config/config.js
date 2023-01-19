@@ -140,10 +140,41 @@ module.exports = {
       adminOnly: true
     },
     {
+      key: 'searchType',
+      name: 'Search Type',
+      description: 'Select a type of search that will be run.  The "Custom SPL Query" requires that you provide a "Splunk Search String". The "Index Discovery Search" runs a metasearch that will return a list of indexes where the searched entity exists. The "Index Discovery Term Search" uses the TERM directive which is more efficient but may not find all results depending on your data format.  The "KV Store Search" will search the specified KV Store and fields.',
+      default: {
+        value: 'spl',
+        display: 'Custom SPL Query'
+      },
+      type: 'select',
+      options: [
+        {
+          value: 'spl',
+          display: 'Custom SPL Query -- requires the "Splunk Search String" option'
+        },
+        {
+          value: 'metaSearchTerm',
+          display: 'Index Discovery Term Search -- run a meta search to discover indexes containing the searched entity'
+        },
+        {
+          value: 'metaSearch',
+          display: 'Index Discovery Search -- run a search across all indexes to discover indexes containing the searched entity'
+        },
+        {
+          value: 'searchKvStore',
+          display: 'KV Store Search -- requires "KV Store Apps & Collections to Search" and "KV Store Search Fields" options'
+        }
+      ],
+      multiple: false,
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
       key: 'searchString',
       name: 'Splunk Search String',
       description:
-        'Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.',
+        'Splunk Search String to execute. This option is only required if your "Search Type" option is set to "Custom SPL Query". The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.',
       default: 'index=main {{ENTITY}} | head 10',
       type: 'text',
       userCanEdit: false,
@@ -153,22 +184,22 @@ module.exports = {
       key: 'searchAppQueryString',
       name: 'Splunk Search App Query',
       description:
-          'The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the "Splunk Search String" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10. If left blank the "Splunk Search String" option value will be used.',
+        'The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the "Splunk Search String" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10. If left blank the "Splunk Search String" option value will be used.',
       default: 'index=main {{ENTITY}} | head 10',
       type: 'text',
       userCanEdit: false,
       adminOnly: false
     },
-    {
-      key: 'doMetasearch',
-      name: 'Run Index Discovery Metasearch',
-      description:
-        'If enabled, the integration will run a metasearch that will return a list of indexes where the searched entity exists. This search will replace your `Splunk Search String` query.',
-      default: false,
-      type: 'boolean',
-      userCanEdit: false,
-      adminOnly: true
-    },
+    // {
+    //   key: 'doMetasearch',
+    //   name: 'Run Index Discovery Metasearch',
+    //   description:
+    //     'If enabled, the integration will run a metasearch that will return a list of indexes where the searched entity exists. This search will replace your `Splunk Search String` query.',
+    //   default: false,
+    //   type: 'boolean',
+    //   userCanEdit: false,
+    //   adminOnly: true
+    // },
     {
       key: 'earliestTimeBound',
       name: 'Earliest Time Bounds',
@@ -199,16 +230,16 @@ module.exports = {
       userCanEdit: true,
       adminOnly: false
     },
-    {
-      key: 'searchKvStore',
-      name: 'Search KV Store',
-      description:
-        'If checked, the KV Store will be searched using the parameters below, which will replace and disable your Standard Splunk Search above.',
-      default: false,
-      type: 'boolean',
-      userCanEdit: true,
-      adminOnly: false
-    },
+    // {
+    //   key: 'searchKvStore',
+    //   name: 'Search KV Store',
+    //   description:
+    //     'If checked, the KV Store will be searched using the parameters below, which will replace and disable your Standard Splunk Search above.',
+    //   default: false,
+    //   type: 'boolean',
+    //   userCanEdit: true,
+    //   adminOnly: false
+    // },
     {
       key: 'kvStoreAppsAndCollections',
       name: 'KV Store Apps & Collections to Search',
