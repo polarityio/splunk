@@ -161,9 +161,9 @@ module.exports = {
     },
     {
       key: 'doMetasearch',
-      name: 'Run Index Discovery Metasearch',
+      name: 'Run Index Discovery Term Metasearch',
       description:
-        'If enabled, the integration will run a metasearch that will return a list of indexes where the searched entity exists. This search will replace your `Splunk Search String` query.',
+        'If enabled, the integration will run a TERM metasearch that will return a list of indexes where the searched entity exists. This search will replace your `Splunk Search String` query.  The Index Discovery Search can only discover indexed entities.',
       default: false,
       type: 'boolean',
       userCanEdit: false,
