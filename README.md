@@ -59,7 +59,27 @@ For example, to search the `mainIndex` you might use a query like this:
 search index=mainIndex indicator=TERM({{ENTITY}})
 ```
 
-Note the use of the `TERM` directive which is important when searching on entities such as IP addresses and provides a significant performance improvement.
+Note the use of the `TERM` directive can allow for more efficient searching of indicators such as IP addresses.
+
+The TERM directive can be used to speed up your search when the entity to search meets the following conditions:
+
+* The entity contains minor breakers, such as periods or underscores (e.g., the periods in an IP address)
+* The entity is bound by major breakers in the data (i.e., spaces, commas, semicolons, question marks, parentheses, exclamation points, and quotation marks)
+* The entity does not contain major breakers
+
+As an example of where the TERM directive will not work is if your data has the following format:
+
+```
+src=8.8.8.8 
+```
+
+In this example, the equal (=) symbol is a minor breaker (as opposed to a major breaker).  Since the IP address `8.8.8.8` is not bound or surrounded by major breakers, the IP `8.8.8.8` is not indexed and will not be found by the TERM search `TERM("8.8.8.8")`.
+
+One way to work around this is to more specifically specify your term in the Splunk Search String.  For example, to find the above example you could do the following:
+
+```
+search index=mainIndex TERM({{ENTITY}}) OR TERM("src={{ENTITY}}") 
+```
 
 For more information on the TERM directive see the Splunk documentation here: https://docs.splunk.com/Documentation/SplunkCloud/latest/Search/UseCASEandTERMtomatchphrases
 
@@ -120,6 +140,8 @@ The exact query run by the integration is as follows:
 | eval index=index, sourcetype=sourcetype
 | table index, sourcetype
 ```
+
+Note that this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. 
 
 For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The prepopulated search has the form:
 
