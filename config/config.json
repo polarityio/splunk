@@ -1,4 +1,5 @@
 {
+  "polarityIntegrationUuid": "b59a2740-cce1-11ed-aeee-075d3490155d",
   "name": "Splunk",
   "acronym": "SPLNK",
   "description": "Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.",
