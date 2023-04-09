@@ -17,6 +17,7 @@ const {
   size
 } = require('lodash/fp');
 const { getLogger } = require('./logger');
+const { escapeQuotes } = require('./utils');
 const { parseErrorToReadableJSON } = require('./errors');
 
 const reduce = require('lodash/fp/reduce').convert({ cap: false });
@@ -147,13 +148,6 @@ const buildSearchString = (entityGroup, options, Logger) => {
 
   return fullMultiEntitySearchString;
 };
-
-/**
- * Used to escape double quotes in entities
- * @param entityValue
- * @returns {*}
- */
-const escapeQuotes = flow(get('value'), replace(/(\r\n|\n|\r)/gm, ''), replace(/"/g, ''));
 
 const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => {
   const statusSuccess = get('statusCode', res) === 200;

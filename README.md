@@ -53,11 +53,13 @@ A Splunk Authentication Token which can be created from the Splunk web interface
 
 Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.
 
-For example, to search the `mainIndex` you might use a query like this:
+For example, to search the `proxy` index you might use a query like this:
 
 ```
-search index=mainIndex indicator=TERM({{ENTITY}})
+search index=proxy srcIp=TERM({{ENTITY}}) | head 10
 ```
+
+#### When to use the TERM Directive
 
 Note the use of the `TERM` directive can allow for more efficient searching of indicators such as IP addresses.
 
@@ -141,15 +143,15 @@ The exact query run by the integration is as follows:
 | table index, sourcetype
 ```
 
-Note that this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. 
+Note that by default this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. If you'd like to override this behavior you can modify the match query by modifying the "Index Discovery Search - Index Discovery Match Query" option.
 
-For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The prepopulated search has the form:
+For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The pre-populated search has the form:
 
 ```
 index={{index}} sourcetype={{sourcetype}} TERM(8.8.8.8)
 ```
 
-Note that the `Earliest Time Bounds` option applies to both the metasearch being run to find the indexes of interest, as well as to the
+Note that the `Earliest Time Bounds` option applies to both the metasearch being run to find the indexes of interest, as well as to the pre-populated search link.
 
 
 ### Earliest Time Bounds
@@ -180,10 +182,19 @@ Comma delimited list of field values to include as part of the summary (no space
  ```
  score,status
  ```
- 
 
-### Search KV Store
-If checked, the KV Store will be searched using the parameters below, which will replace and disable your Standard Splunk Search above.
+
+### Index Discovery Search - Index Discovery Match Query
+
+The Index Discovery Match Query allows you to override the default matching behavior when running the Index Discovery metasearch.
+
+The default behavior is to use a TERM query across all indexes:
+
+```
+index=* TERM("${entityValue}")
+```
+
+Certain indexes will not work 
 
 ### KV Store Apps & Collections to Search
 A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on.  Each comma separated pair must use the format `<app-name>:<collection-name>`

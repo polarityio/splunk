@@ -15,6 +15,7 @@ const {
   size
 } = require('lodash/fp');
 const { parseErrorToReadableJSON } = require('./errors');
+const { escapeQuotes } = require('./utils');
 
 const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
@@ -95,21 +96,18 @@ const handleStandardQueryResponse =
   };
 
 const createMetaSearch = (entityValue, options) => {
-  if (options.searchType.value === 'metaSearchTerm') {
-    return `| metasearch index=* TERM("${entityValue}") 
-     | dedup index, sourcetype    
-     | stats values(sourcetype) AS sourcetype by index    
-     | mvexpand sourcetype    
-     | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
-     | table index, sourcetype, entity`;
-  } else {
-    return `search index=* "${entityValue}" 
-     | dedup index, sourcetype    
-     | stats values(sourcetype) AS sourcetype by index    
-     | mvexpand sourcetype    
-     | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
-     | table index, sourcetype, entity`;
+  if (options.indexDiscoveryMatchQuery.trim().length === 0) {
+    options.indexDiscoveryMatchQuery = `index=* TERM("{{ENTITY}}")`;
   }
+
+  const matchQuery = options.indexDiscoveryMatchQuery.replace(/{{ENTITY}}/gi, entityValue);
+
+  return `| metasearch ${matchQuery}
+     | dedup index, sourcetype
+     | stats values(sourcetype) AS sourcetype by index
+     | mvexpand sourcetype
+     | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
+     | table index, sourcetype, entity`;
 };
 
 const buildSearchString = (entityGroup, options, Logger) => {
@@ -125,13 +123,6 @@ const buildSearchString = (entityGroup, options, Logger) => {
   Logger.trace({ fullMultiEntitySearchString }, 'Multi-entity meta search string');
   return fullMultiEntitySearchString;
 };
-
-/**
- * Used to escape double quotes in entities
- * @param entityValue
- * @returns {*}
- */
-const escapeQuotes = flow(get('value'), replace(/(\r\n|\n|\r)/gm, ''), replace(/"/g, ''));
 
 const buildQueryResultFromResponseStatus = (entityGroup, options, res, body, Logger) => {
   const statusSuccess = get('statusCode', res) === 200;
