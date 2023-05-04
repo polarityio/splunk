@@ -63,17 +63,10 @@ function startup(logger) {
 
   const startingRequestWithDefaults = request.defaults(defaults);
 
-  requestWithDefaults = (requestOptions, options, callback) =>
-    addAuthHeaders(requestOptions, options, (err, requestOptionsWithAuth) => {
-      if (err) {
-        return callback({
-          ...JSON.parse(JSON.stringify(err, Object.getOwnPropertyNames(err))),
-          isAuthError: true
-        });
-      }
-
-      startingRequestWithDefaults(requestOptionsWithAuth, callback);
-    });
+  requestWithDefaults = (requestOptions, options, callback) => {
+    const requestOptionsWithAuth = addAuthHeaders(requestOptions, options);
+    startingRequestWithDefaults(requestOptionsWithAuth, callback);
+  };
 }
 
 const doLookup = (entities, options, cb) => {

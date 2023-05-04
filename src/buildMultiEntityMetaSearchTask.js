@@ -20,6 +20,7 @@ const { escapeQuotes } = require('./utils');
 const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
 const EXPECTED_QUERY_STATUS_CODES = [200, 404];
+const DEFAULT_MATCH_QUERY = 'index=* TERM("{{ENTITY}}")';
 
 const buildMultiEntityMetaSearchTask = (
   entityGroup,
@@ -43,6 +44,8 @@ const buildMultiEntityMetaSearchTask = (
     requestOptions.qs.earliest_time = options.earliestTimeBound;
   }
 
+  Logger.trace({requestOptions}, 'Metasearch Request Options');
+
   requestWithDefaults(
     requestOptions,
     options,
@@ -52,6 +55,7 @@ const buildMultiEntityMetaSearchTask = (
 
 const handleStandardQueryResponse =
   (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
+    Logger.trace({error, res, body}, 'Raw Metasearch Response');
     const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
       get('statusCode', res)
     );
@@ -97,7 +101,8 @@ const handleStandardQueryResponse =
 
 const createMetaSearch = (entityValue, options) => {
   if (options.indexDiscoveryMatchQuery.trim().length === 0) {
-    options.indexDiscoveryMatchQuery = `index=* TERM("{{ENTITY}}")`;
+    // Set the default match query if the user has removed it
+    options.indexDiscoveryMatchQuery = DEFAULT_MATCH_QUERY;
   }
 
   const matchQuery = options.indexDiscoveryMatchQuery.replace(/{{ENTITY}}/gi, entityValue);
