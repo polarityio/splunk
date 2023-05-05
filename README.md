@@ -39,11 +39,11 @@ The URL for the Splunk Search App including schema (i.e., https://) and port (e.
 
 ### Splunk Username
 
-Valid Splunk username. Leave this field blank is authenticating via a Splunk Authentication Token.
+Valid Splunk username. Leave this field blank if authenticating via a Splunk Authentication Token.
 
 ### Splunk Password
 
-Valid Splunk password corresponding to the username specified above. Leave this field blank is authenticating via a Splunk Authentication Token.
+Valid Splunk password corresponding to the username specified above. Leave this field blank if authenticating via a Splunk Authentication Token.
 
 ### Splunk Authentication Token
 
@@ -72,18 +72,17 @@ By default, the exact metasearch query run by the integration is as follows:
 | table index, sourcetype
 ```
 
-Note that by this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. If you'd like to override this behavior you can modify the match query by modifying the "8. Index Discovery Search - Index Discovery Match Query" option.
+Note that this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. If you'd like to override this behavior you can modify the match query by modifying the `8. Index Discovery Search - Index Discovery Match Query` option.
 
-For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The pre-populated search has the form:
+For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The default pre-populated search app search has the form:
 
 ```
 index={{index}} sourcetype={{sourcetype}} TERM(8.8.8.8)
 ```
 
-If you provide a custom Index Discovery Match Query (option 8), then this match query will be used to create teh search app link.
+If you provide a value for option `8. Index Discovery Search - Index Discovery Match Query`, then this match query will be used to create the search app link.
 
 The value of the `1. Earliest Time Bounds` option will be applied to the metasearch.
-
 
 #### KV Store Search
 
@@ -91,7 +90,9 @@ The "KV Store Search" will search the specified KV Store collection for the give
 
 ### 1. Earliest Time Bounds
 
-Sets the earliest (inclusive) time bounds for the "Custom SPL Search" or "Index Discovery Search". If set, this option will override any time bounds set in the "Custom SPL Search - Splunk Search String" option. Leave blank to only use time bounds set via the "Custom SPL Search - Splunk Search String" option. This option should be set to "Users can view only". 
+Sets the earliest (inclusive) time bounds for the `Custom SPL Search` and  `Index Discovery Search` search types. If set, this option will override any time bounds set in the `2. Custom SPL Search - Splunk Search String` option. Leave blank to only use time bounds set via the `2. Custom SPL Search - Splunk Search String` option. 
+
+> This option should be set to "Users can view only". 
 
 Defaults to `-1mon`.
 
@@ -104,7 +105,7 @@ Common examples include
 
 ### 2. Custom SPL Search - Splunk Search String
 
-Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.
+Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator.
 
 For example, to search the `proxy` index you might use a query like this:
 
@@ -140,7 +141,7 @@ For more information on the TERM directive see the Splunk documentation here: ht
 
 #### Limit Searches by Time
 
-As a general rule of thumb you should try to narrow down the search scope. A great way to limit the search scope is limit the time frame of data you are searching.  You can limit the time bounds of your search by using the `Earliest Time Bounds` option.  If you manually specify a time bounds using the "earliest" directive you should clear the `Earliest Time Bounds` option.  
+As a general rule of thumb you should try to narrow down the search scope. A great way to limit the search scope is limit the time frame of data you are searching.  You can limit the time bounds of your search by using the `1. Earliest Time Bounds` option.  If you manually specify a time bounds using the "earliest" directive you should clear the `1. Earliest Time Bounds` option.  
 
 For a list of valid time modifiers see the documentation here: https://docs.splunk.com/Documentation/SCS/current/Search/Timemodifiers
 
@@ -193,7 +194,7 @@ As an example, if our `Splunk Search String` value is:
 index=main "{{ENTITY}}" | head 10
 ```
 
-When opening this query in the Splunk app we may want to remove the `head 10`.  This option could then be set to: 
+When opening this query in the Splunk app you may want to remove the `head 10` so that all results are returned.  This option could then be set to: 
 
 ```
 index=main "{{ENTITY}}"
@@ -239,6 +240,18 @@ The default behavior is to use a TERM query across all indexes:
 
 ```
 index=* TERM("${entityValue}")
+```
+
+However, if the indexes you wish to search have non-indexed fields you may need to provide a more specific search term.  As an example, if you have records of the form `src=8.8.8.8`, the TERM directive will not find these records.  You could provide an expanded match query like this:
+
+```
+index=* TERM("${entityValue}") OR TERM("src=${entityValue}")
+```
+
+As another example, if you didn't want to run a discovery search across all indexes but instead wanted to target a specific set of indexes you could use the following match query:
+
+```
+index=idx1,idx2,idx3,idx4,idx5 TERM("${entityValue}")
 ```
 
  ## Installation Instructions
