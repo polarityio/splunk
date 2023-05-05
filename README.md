@@ -49,7 +49,60 @@ Valid Splunk password corresponding to the username specified above. Leave this 
 
 A Splunk Authentication Token which can be created from the Splunk web interface by going to "Settings -> Tokens".
 
-### Splunk Search String
+### Search Type
+
+Select the type of search that will be run. There are three types of searches:
+
+#### Custom SPL Search
+
+The "Custom SPL Search" runs a user provided SPL query and displays results. Review options 1, 2, 3, 4 and 5 if selecting this search type.
+
+#### Index Discovery Search
+
+The "Index Discovery Search" runs a metasearch that will return a list of indexes where the searched entity exists. Review options 1, 4, 5, 6, and 7 if selecting this search type.
+
+By default, the exact metasearch query run by the integration is as follows:
+
+```
+| metasearch index=* earliest={{time-bounds}} TERM({{ENTITY}}) 
+| dedup index, sourcetype    
+| stats values(sourcetype) AS sourcetype by index    
+| mvexpand sourcetype    
+| eval index=index, sourcetype=sourcetype
+| table index, sourcetype
+```
+
+Note that by this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. If you'd like to override this behavior you can modify the match query by modifying the "8. Index Discovery Search - Index Discovery Match Query" option.
+
+For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The pre-populated search has the form:
+
+```
+index={{index}} sourcetype={{sourcetype}} TERM(8.8.8.8)
+```
+
+If you provide a custom Index Discovery Match Query (option 8), then this match query will be used to create teh search app link.
+
+The value of the `1. Earliest Time Bounds` option will be applied to the metasearch.
+
+
+#### KV Store Search
+
+The "KV Store Search" will search the specified KV Store collection for the given entity. Review options 1 and 8 if selecting this search type. 
+
+### 1. Earliest Time Bounds
+
+Sets the earliest (inclusive) time bounds for the "Custom SPL Search" or "Index Discovery Search". If set, this option will override any time bounds set in the "Custom SPL Search - Splunk Search String" option. Leave blank to only use time bounds set via the "Custom SPL Search - Splunk Search String" option. This option should be set to "Users can view only". 
+
+Defaults to `-1mon`.
+
+Common examples include
+
+* `-6mon`: last 6 months
+* `-1mon`: last month
+* `-7d`: last 7 days
+* `-4h`: last 4 hours
+
+### 2. Custom SPL Search - Splunk Search String
 
 Splunk Search String to execute. The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10.
 
@@ -128,44 +181,25 @@ There are other internal Splunk fields which all begin with an underscore (`_`).
 search source="malicious-indicators" sourcetype="csv" value=TERM({{entity}})" | fields score, status, value | fields - _* | head 10
 ```
 
-### Run Index Discovery Metasearch
+### 3. Custom SPL Search - Splunk Search App Query
 
-If enabled, the integration will run a metasearch that will return a list of indexes where the searched entity exists. This search will replace your `Splunk Search String` query.
+The query to execute when opening the Splunk Search App from the Polarity Overlay Window. In most cases this query will be the same as the "Splunk Search String" option. The string `{{ENTITY}}` will be replaced by the looked up indicator. If left blank the `2. Custom SPL Search - Splunk Search String` option value will be used.
 
-The exact query run by the integration is as follows:
+Default: Empty
 
-```
-| metasearch index=* earliest={{time-bounds}} TERM({{ENTITY}}) 
-| dedup index, sourcetype    
-| stats values(sourcetype) AS sourcetype by index    
-| mvexpand sourcetype    
-| eval index=index, sourcetype=sourcetype
-| table index, sourcetype
-```
-
-Note that by default this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. If you'd like to override this behavior you can modify the match query by modifying the "Index Discovery Search - Index Discovery Match Query" option.
-
-For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The pre-populated search has the form:
+As an example, if our `Splunk Search String` value is:
 
 ```
-index={{index}} sourcetype={{sourcetype}} TERM(8.8.8.8)
+index=main "{{ENTITY}}" | head 10
 ```
 
-Note that the `Earliest Time Bounds` option applies to both the metasearch being run to find the indexes of interest, as well as to the pre-populated search link.
+When opening this query in the Splunk app we may want to remove the `head 10`.  This option could then be set to: 
 
+```
+index=main "{{ENTITY}}"
+```
 
-### Earliest Time Bounds
-
-Sets the earliest (inclusive) time bounds for the "Splunk Search String" or "Index Discovery Metasearch". If set, this option will override any time bounds set in the "Splunk Search String" option". Leave blank to only use time bounds set via the "Splunk Search String" option. This option should be set to "Users can view only". Defaults to `-1mon`.
-
-Common examples include
-
-* `-6mon`: last 6 months
-* `-1mon`: last month
-* `-7d`: last 7 days
-* `-4h`: last 4 hours
-
-### Summary Fields
+### 4. Custom SPL/KV Store Search - Summary Fields
 
 Comma delimited list of field values to include as part of the summary (no spaces between commas). These fields must be returned by your search query. This option must be set to "User can view and edit" or "User can view only".
 
@@ -183,8 +217,21 @@ Comma delimited list of field values to include as part of the summary (no space
  score,status
  ```
 
+### 5. Custom SPL/KV Store Search - Include Field Name in Summary
 
-### Index Discovery Search - Index Discovery Match Query
+If checked, field names will be included as part of the summary fields. This option must be set to "User can view and edit" or "User can view only".
+
+### 6. KV Store Search - Apps & Collections to Search
+A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on. Each comma separated pair must use the format "<app-name>:<collection-name>".To see a list of available collections to search, set the "Search Type" to "KV Store Search", leave this field empty and click "Apply Changes".
+
+### 7. KV Store Search - Search Fields
+A comma separated list of KV Store Collection Fields to search on. To see a list of available fields to search on, leave this field empty and set option 6, `KV Store Search - Apps & Collections to Search` to your desired collections, then click "Apply Changes". 
+
+> ***Note:*** Minimizing these will improve KV Store search times.
+
+> ***Note:*** You can also use these fields in the "Summary Fields" option above.
+
+### 8. Index Discovery Search - Index Discovery Match Query
 
 The Index Discovery Match Query allows you to override the default matching behavior when running the Index Discovery metasearch.
 
@@ -193,17 +240,6 @@ The default behavior is to use a TERM query across all indexes:
 ```
 index=* TERM("${entityValue}")
 ```
-
-Certain indexes will not work 
-
-### KV Store Apps & Collections to Search
-A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on.  Each comma separated pair must use the format `<app-name>:<collection-name>`
-To see a list of available collections to search, leave this field empty, check the "Search KV Store" option above, and click "Apply Changes".
-
-### KV Store Search Fields
-A comma separated list of KV Store Collection Fields to search on. To see a list of available fields to search on, leave this field empty, check the "Search KV Store" option above, and set "KV Store Apps & Collections to Search" to your desired collections, then click "Apply Changes".
-> ***Note:*** Minimizing these will improve KV Store search times.
-> ***Note:*** You can also use these fields in the "Summary Fields" option above.
 
  ## Installation Instructions
 
