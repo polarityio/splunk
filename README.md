@@ -157,7 +157,7 @@ Common examples include
 If your search can return more than 1 result you should always limit your query to only return a small number of events.  This can be done using the `head` parameter:
 
 ```
-search source="malicious-indicators" sourcetype="csv" value=TERM({{entity}}) | head 10
+search source="malicious-indicators" sourcetype="csv" value=TERM({{ENTITY}}) | head 10
 ```
 
 The above search will search the `malicious-indicators` source and return events where the `value` field equals the `{{ENTITY}}` being looked up.  The search will only search the last 90 days of data and will only return the first 10 results.
@@ -167,19 +167,19 @@ The above search will search the `malicious-indicators` source and return events
 It is also important to limit how much data your search returns.  You can specify specific fields to include using the `fields` parameter.  For example, if you only want to return the `score`, `status`, and `value` fields you could use the following query:
 
 ```
-search source="malicious-indicators" sourcetype="csv" value=TERM({{entity}}) | fields score, status, value | head 10
+search source="malicious-indicators" sourcetype="csv" value=TERM({{ENTITY}}) | fields score, status, value | head 10
 ```
 
 In addition to specifying which fields to return you can also tell Splunk not to return certain fields.  In particular, you can cut down on the amount of data returned by telling Splunk not to return the `_raw` field which is the entire raw event record as a string.  To tell Splunk not to return specific fields you add the `-` (minus sign), in front of the field names you do not want to return.  By default, Splunk will return the `_raw` field so it is a good idea to specifically remove it.
 
 ```
-search source="malicious-indicators" sourcetype="csv" value=TERM({{entity}}) | fields score, status, value | fields - _raw | head 10
+search source="malicious-indicators" sourcetype="csv" value=TERM({{ENTITY}}) | fields score, status, value | fields - _raw | head 10
 ```  
 
 There are other internal Splunk fields which all begin with an underscore (`_`).  You can remove all the internal fields from being returned by using the wildcard syntax which is an asterisk (`_*`).
 
 ```
-search source="malicious-indicators" sourcetype="csv" value=TERM({{entity}})" | fields score, status, value | fields - _* | head 10
+search source="malicious-indicators" sourcetype="csv" value=TERM({{ENTITY}})" | fields score, status, value | fields - _* | head 10
 ```
 
 ### 3. Custom SPL Search - Splunk Search App Query
@@ -239,19 +239,19 @@ The Index Discovery Match Query allows you to override the default matching beha
 The default behavior is to use a TERM query across all indexes:
 
 ```
-index=* TERM("${entityValue}")
+index=* TERM("{{ENTITY}}")
 ```
 
 However, if the indexes you wish to search have non-indexed fields you may need to provide a more specific search term.  As an example, if you have records of the form `src=8.8.8.8`, the TERM directive will not find these records.  You could provide an expanded match query like this:
 
 ```
-index=* TERM("${entityValue}") OR TERM("src=${entityValue}")
+index=* TERM("{{ENTITY}}") OR TERM("src={{ENTITY}}")
 ```
 
 As another example, if you didn't want to run a discovery search across all indexes but instead wanted to target a specific set of indexes you could use the following match query:
 
 ```
-index=idx1,idx2,idx3,idx4,idx5 TERM("${entityValue}")
+index=idx1 or index=idx2 or index=idx3 TERM("{{ENTITY}}")
 ```
 
  ## Installation Instructions
