@@ -113,6 +113,32 @@ For example, to search the `proxy` index you might use a query like this:
 search index=proxy srcIp=TERM({{ENTITY}}) | head 10
 ```
 
+Custom SPL searches also support running `metasearch`, `tstats`, `inputlookup` and macros.
+
+#### metasearch
+
+Metasearch example:
+
+```
+| metasearch index=polarity TERM({{ENTITY}}) | eval entity="{{ENTITY}}" | head 10
+```
+
+#### tstats 
+
+The following tstats example will return the first and last time a particular entity was seen as well as a total count across all indexes. 
+
+```
+| tstats min(_time) as first_seen, max(_time) as last_seen, count where index=* AND TERM({{ENTITY}}) by index, sourcetype | convert ctime(first_seen) ctime(last_seen) | stats values(index), values(sourcetype), min(first_seen),max(last_seen),sum(count) | rename values(index) as indexes, values(sourcetype) as sourcetypes | eval entity="{{ENTITY}}"
+```
+
+#### inputlookup
+
+inputlookup example:
+
+```
+
+```
+
 #### When to use the TERM Directive
 
 Note the use of the `TERM` directive can allow for more efficient searching of indicators such as IP addresses.
