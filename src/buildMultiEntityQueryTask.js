@@ -26,9 +26,10 @@ const { buildMultiEntityMetaSearchTask } = require('./buildMultiEntityMetaSearch
 const EXPECTED_QUERY_STATUS_CODES = [200, 404];
 const VALID_SPL_COMMAND_REGEXES = [
   /search/i,
-  /|\s*metasearch/i,
-  /|\s*tstats/i,
-  /|\s*inputlookup/i
+  /\|\s*metasearch/i,
+  /\|\s*tstats/i,
+  /\|\s*inputlookup/i,
+  /\|\s*`/i //macros in Splunk are encapsulated in backticks
 ];
 
 const buildMultiEntityQueryTask =
