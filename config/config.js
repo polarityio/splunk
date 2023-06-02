@@ -248,7 +248,7 @@ module.exports = {
       key: 'indexDiscoveryMatchQuery',
       name: '8. Index Discovery Search - Index Discovery Match Query',
       description:
-        'The query used to find matches as part of the "Index Discovery Term Search" search type. Defaults to `index=* TERM("{{ENTITY}}")`.',
+        'The query used to find matches as part of the "Index Discovery Term Search" search type. Defaults to `index=* TERM("{{ENTITY}}")`.  This value should only be changed if you need to implement custom TERM queries for your indexes or if you want to specify a set of indexes to search.',
       default: 'index=* TERM("{{ENTITY}}")',
       type: 'text',
       userCanEdit: false,
