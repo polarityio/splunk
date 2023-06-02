@@ -113,6 +113,14 @@ For example, to search the `proxy` index you might use a query like this:
 search index=proxy srcIp=TERM({{ENTITY}}) | head 10
 ```
 
+**IMPORTANT**: Since the integration leverages bulk searching, it is important that each returned row contain the entity value that is being looked up. This allows the integration to match returned records with the related entity.  For typical search queries this will automatically be the case.  However, for queries such as `tstats` or `metasearch` you may need to ensure that the entity is inserted into the returned records.  A simple way to do this is by appending the `eval` command to the end of the search:
+
+```
+| eval entity="{{ENTITY}}"
+```
+
+This will ensure each returned row include an `entity` property with the value of the entity being searched.
+
 Custom SPL searches also support running `metasearch`, `tstats`, `inputlookup` and macros.
 
 #### metasearch
@@ -136,7 +144,7 @@ The following tstats example will return the first and last time a particular en
 inputlookup example:
 
 ```
-
+| inputlookup kvstorecoll_lookup where (Port=443) AND (SourceIP="{{ENTITY}}") | head 10
 ```
 
 #### When to use the TERM Directive
