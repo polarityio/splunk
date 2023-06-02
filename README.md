@@ -2,9 +2,9 @@
 
 Polarity's Splunk integration allows a user to connect and search a Splunk Enterprise or Splunk Cloud instance with a customized search string.  Additionally, the integration supports running an "Index discovery" metasearch (see Index Discovery section below), as well as Splunk KVStore data.
 
-| ![](images/overlay.png) |![](images/metasearch.png)
-|---|---|
-|*Custom Search Query* |*Index Discovery metasearch*|
+| ![](images/overlay.png) |![](images/metasearch.png) | ![](images/tstats.png) |
+|---|---|---|
+|*Custom Search Query* |*Index Discovery metasearch*|*tstats search example*|
 
 ## Required: Enabling Token Authentication
 
