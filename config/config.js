@@ -204,11 +204,11 @@ module.exports = {
       key: 'summaryFields',
       name: '4. Custom SPL/KV Store Search - Summary Fields',
       description:
-        'Comma delimited list of field values to include as part of the summary for Custom SPL and KV Store searches (no spaces between commas).  These fields must be returned by your search query. This option must be set to "User can view and edit" or "User can view only".',
+        'Comma delimited list of field values to include as part of the summary for Custom SPL and KV Store searches (no spaces between commas).  If no summary fields are specified a result count will be displayed. Summary fields must be returned by your search query.',
       default: '_si,_serial',
       type: 'text',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'includeFieldNameInSummary',
@@ -217,7 +217,7 @@ module.exports = {
         'If checked, field names will be included as part of the summary fields. This option must be set to "User can view and edit" or "User can view only".',
       default: true,
       type: 'boolean',
-      userCanEdit: true,
+      userCanEdit: false,
       adminOnly: false
     },
     {
@@ -228,8 +228,8 @@ module.exports = {
         'To see a list of available collections to search, set the "Search Type" to "KV Store Search", leave this field empty and click "Apply Changes".',
       default: '',
       type: 'text',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'kvStoreSearchStringFields',
@@ -241,8 +241,8 @@ module.exports = {
         'Note: You can also use these fields in the "Summary Fields" option above.',
       default: '',
       type: 'text',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'indexDiscoveryMatchQuery',
