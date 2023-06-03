@@ -153,17 +153,17 @@ module.exports = {
         {
           value: 'spl',
           display:
-            'Custom SPL Search -- display results from a custom SPL query -- requires options 1, 2, 3, 4, and 5'
+            'Custom SPL Search -- display results from a custom SPL query -- requires options 1, 2, 3, 4, 5, and 6'
         },
         {
           value: 'searchKvStore',
           display:
-            'KV Store Search -- search collections in the Splunk KV Store -- requires options 1, 4, 5, 6, and 7'
+            'KV Store Search -- search collections in the Splunk KV Store -- requires options 1, 4, 5, 6, 7, and 8'
         },
         {
           value: 'metaSearchTerm',
           display:
-            'Index Discovery Search -- display indexes containing the searched entity -- requires options 1 and 8'
+            'Index Discovery Search -- display indexes containing the searched entity -- requires options 1 and 9'
         }
       ],
       multiple: false,
@@ -221,8 +221,18 @@ module.exports = {
       adminOnly: false
     },
     {
+      key: 'maxSummaryTags',
+      name: '6. Custom SPL/KV Store Search - Maximum Number of Summary Tags Displayed',
+      description:
+          'The maximum number of summary tags to display in the Overlay Window before showing a count.  If set to 0, all tags will be shown.',
+      default: 4,
+      type: 'number',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
       key: 'kvStoreAppsAndCollections',
-      name: '6. KV Store Search - Apps & Collections to Search',
+      name: '7. KV Store Search - Apps & Collections to Search',
       description:
         'A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on.  Each comma separated pair must use the format "<app-name>:<collection-name>".' +
         'To see a list of available collections to search, set the "Search Type" to "KV Store Search", leave this field empty and click "Apply Changes".',
@@ -233,7 +243,7 @@ module.exports = {
     },
     {
       key: 'kvStoreSearchStringFields',
-      name: '7. KV Store Search - Search Fields',
+      name: '8. KV Store Search - Search Fields',
       description:
         'A comma separated list of KV Store Collection Fields to search on.' +
         'To see a list of available fields to search on, leave this field empty and set option 6, "KV Store Search - Apps & Collections to Search" to your desired collections, then click "Apply Changes".' +
@@ -246,7 +256,7 @@ module.exports = {
     },
     {
       key: 'indexDiscoveryMatchQuery',
-      name: '8. Index Discovery Search - Index Discovery Match Query',
+      name: '9. Index Discovery Search - Index Discovery Match Query',
       description:
         'The query used to find matches as part of the "Index Discovery Term Search" search type. Defaults to `index=* TERM("{{ENTITY}}")`.  This value should only be changed if you need to implement custom TERM queries for your indexes or if you want to specify a set of indexes to search.',
       default: 'index=* TERM("{{ENTITY}}")',

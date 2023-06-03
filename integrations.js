@@ -124,7 +124,7 @@ const doLookup = (entities, options, cb) => {
                   search: result.searchQuery,
                   searchAppQuery: result.searchAppQuery,
                   searchType: result.searchType,
-                  tags: _getSummaryTags(result.searchResponseBody, summaryFields)
+                  tags: _getSummaryTags(result.searchResponseBody, summaryFields, options)
                 }
               }
         };
@@ -136,7 +136,7 @@ const doLookup = (entities, options, cb) => {
   });
 };
 
-function _getSummaryTags(results, summaryFields) {
+function _getSummaryTags(results, summaryFields, options) {
   const tags = new Map();
 
   results.forEach((item) => {
@@ -151,7 +151,14 @@ function _getSummaryTags(results, summaryFields) {
     });
   });
 
-  return Array.from(tags.values());
+  let tagsList = Array.from(tags.values());
+  if (tagsList.length > options.maxSummaryTags && options.maxSummaryTags > 0) {
+    let length = tagsList.length;
+    tagsList = tagsList.slice(0, options.maxSummaryTags);
+    tagsList.push({ value: `+${length - options.maxSummaryTags} more` });
+  }
+
+  return tagsList;
 }
 
 const validateOptions = async (options, callback) => {
