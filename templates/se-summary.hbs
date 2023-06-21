@@ -10,20 +10,16 @@
       <span class="integration-text-color">Results: {{details.results.length}}</span>
     </span>
   {{/if}}
-  {{#if block.userOptions.includeFieldNameInSummary}}
-    {{#each details.tags as |tag|}}
-      <span {{on "click" (optional this.scrollToIntegration)}} class="integration-summary-tag integration-background-color integration-border-color">
-        <span class="acronym integration-text-bold-color">{{block.acronym}}</span>
-        <span class="integration-text-color">{{tag.field}}: {{tag.value}}</span>
+  {{#each details.tags as |tag|}}
+    <span {{on "click" (optional this.scrollToIntegration)}} class="integration-summary-tag integration-background-color integration-border-color">
+      <span class="acronym integration-text-bold-color">{{block.acronym}}</span>
+      <span class="integration-text-color">
+        {{#if (and block.userOptions.includeFieldNameInSummary tag.field)}}
+          {{tag.field}}:
+        {{/if}}
+        {{tag.value}}
       </span>
-    {{/each}}
-  {{else}}
-    {{#each details.tags as |tag|}}
-      <span {{on "click" (optional this.scrollToIntegration)}} class="integration-summary-tag integration-background-color integration-border-color">
-        <span class="acronym integration-text-bold-color">{{block.acronym}}</span>
-        <span class="integration-text-color">{{tag.value}}</span>
-      </span>
-    {{/each}}
-  {{/if}}
+    </span>
+  {{/each}}
 {{/if}}
 

@@ -17,18 +17,24 @@ const {
   size
 } = require('lodash/fp');
 const { getLogger } = require('./logger');
+const { escapeQuotes } = require('./utils');
 const { parseErrorToReadableJSON } = require('./errors');
-
-const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
 const { searchKvStoreAndAddToResults } = require('./getKvStoreQueryResults');
 const { buildMultiEntityMetaSearchTask } = require('./buildMultiEntityMetaSearchTask');
 
 const EXPECTED_QUERY_STATUS_CODES = [200, 404];
+const VALID_SPL_COMMAND_REGEXES = [
+  /search/i,
+  /\|\s*metasearch/i,
+  /\|\s*tstats/i,
+  /\|\s*inputlookup/i,
+  /\|\s*`/i //macros in Splunk are encapsulated in backticks
+];
 
 const buildMultiEntityQueryTask =
   (entityGroup, options, requestWithDefaults, Logger) => (done) => {
-    if (options.searchKvStore) {
+    if (options.searchType.value === 'searchKvStore') {
       searchKvStoreAndAddToResults(
         entityGroup,
         options,
@@ -36,7 +42,10 @@ const buildMultiEntityQueryTask =
         done,
         Logger
       );
-    } else if (options.doMetasearch) {
+    } else if (
+      options.searchType.value === 'metaSearch' ||
+      options.searchType.value === 'metaSearchTerm'
+    ) {
       buildMultiEntityMetaSearchTask(
         entityGroup,
         options,
@@ -59,6 +68,8 @@ const buildMultiEntityQueryTask =
         requestOptions.qs.earliest_time = options.earliestTimeBound;
       }
 
+      Logger.trace({ requestOptions }, 'Custom SPL Search Request Options');
+
       requestWithDefaults(
         requestOptions,
         options,
@@ -75,6 +86,10 @@ const buildMultiEntityQueryTask =
 
 const handleStandardQueryResponse =
   (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
+    Logger.trace(
+      { body, statusCode: res ? res.statusCode : 'N/A' },
+      'Raw Query Response'
+    );
     const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
       get('statusCode', res)
     );
@@ -117,42 +132,70 @@ const handleStandardQueryResponse =
     }
   };
 
+/**
+ * If the SPL string has no search prefix then add the `search` command prefix, otherwise don't modify the search
+ * Valid prefixes are specified in the `VALID_SPL_COMMANDS` set:
+ *
+ * ```
+ * tstats
+ * metasearch
+ * search
+ * inputlookup
+ * ```
+ *
+ * @param entityGroup
+ * @param options
+ * @param Logger
+ * @returns {*}
+ */
 const buildSearchString = (entityGroup, options, Logger) => {
   const searchString = flow(get('searchString'), trim)(options);
-  const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
-    ? flow(replace(/search/i, ''), trim)(searchString)
-    : searchString;
 
-  const fullMultiEntitySearchString = reduce(
-    (agg, entity, index) =>
-      index === 0
-        ? `search ${replace(
-            /{{ENTITY}}/gi,
-            flow(first, escapeQuotes)(entityGroup),
-            searchStringWithoutPrefix
-          )}`
-        : `${agg} | append [ search ${replace(
-            /{{ENTITY}}/gi,
-            escapeQuotes(entity),
-            searchStringWithoutPrefix
-          )}]`,
-    '',
-    entityGroup
-  );
+  const queryStartsWithValidSplCommand = VALID_SPL_COMMAND_REGEXES.some((splCommand) => {
+    if (splCommand.test(searchString)) {
+      return true;
+    }
+  });
+
+  const fullMultiEntitySearchString = entityGroup.reduce((accum, entity, index) => {
+    if (index === 0) {
+      if (queryStartsWithValidSplCommand) {
+        return `${replace(
+          /{{ENTITY}}/gi,
+          flow(first, escapeQuotes)(entityGroup),
+          searchString
+        )}`;
+      } else {
+        return `search ${replace(
+          /{{ENTITY}}/gi,
+          flow(first, escapeQuotes)(entityGroup),
+          searchString
+        )}`;
+      }
+    } else {
+      if (queryStartsWithValidSplCommand) {
+        return `${accum} | append [ ${replace(
+          /{{ENTITY}}/gi,
+          escapeQuotes(entity),
+          searchString
+        )}]`;
+      } else {
+        return `${accum} | append [ search ${replace(
+          /{{ENTITY}}/gi,
+          escapeQuotes(entity),
+          searchString
+        )}]`;
+      }
+    }
+  }, '');
 
   Logger.trace({ fullMultiEntitySearchString }, 'Multi-entity search string');
 
   return fullMultiEntitySearchString;
 };
 
-/**
- * Used to escape double quotes in entities
- * @param entityValue
- * @returns {*}
- */
-const escapeQuotes = flow(get('value'), replace(/(\r\n|\n|\r)/gm, ''), replace(/"/g, ''));
-
 const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => {
+  const Logger = getLogger();
   const statusSuccess = get('statusCode', res) === 200;
 
   // Splunk returns newline delimited JSON objects.  As a result we need to
@@ -167,6 +210,8 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
       map(pick('result')),
       uniqWith(isEqual)
     )(body);
+
+  Logger.trace({ formattedBody }, 'Formatted Body');
 
   const successResult =
     statusSuccess &&
