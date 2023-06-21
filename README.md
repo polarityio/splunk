@@ -55,11 +55,15 @@ Select the type of search that will be run. There are three types of searches:
 
 #### Custom SPL Search
 
-The "Custom SPL Search" runs a user provided SPL query and displays results. Review options 1, 2, 3, 4 and 5 if selecting this search type.
+The "Custom SPL Search" runs a user provided SPL query and displays results. Review options 1, 2, 3, 4, 5 and 6 if selecting this search type.
+
+#### KV Store Search
+
+The "KV Store Search" will search the specified KV Store collection for the given entity. Review options 1, 4, 5, 6, 7 and 8 if selecting this search type.
 
 #### Index Discovery Search
 
-The "Index Discovery Search" runs a metasearch that will return a list of indexes where the searched entity exists. Review options 1, 4, 5, 6, and 7 if selecting this search type.
+The "Index Discovery Search" runs a metasearch that will return a list of indexes where the searched entity exists. Review options 1 and 9 if selecting this search type.
 
 By default, the exact metasearch query run by the integration is as follows:
 
@@ -83,10 +87,6 @@ index={{index}} sourcetype={{sourcetype}} TERM(8.8.8.8)
 If you provide a value for option `8. Index Discovery Search - Index Discovery Match Query`, then this match query will be used to create the search app link.
 
 The value of the `1. Earliest Time Bounds` option will be applied to the metasearch.
-
-#### KV Store Search
-
-The "KV Store Search" will search the specified KV Store collection for the given entity. Review options 1 and 8 if selecting this search type. 
 
 ### 1. Earliest Time Bounds
 
@@ -256,17 +256,21 @@ Comma delimited list of field values to include as part of the summary (no space
 
 If checked, field names will be included as part of the summary fields. This option must be set to "User can view and edit" or "User can view only".
 
-### 6. KV Store Search - Apps & Collections to Search
+### 6. Custom SPL/KV Store Search - Maximum Number of Summary Tags Displayed
+
+The maximum number of summary tags to display in the Overlay Window before showing a count.  If set to 0, all tags will be shown.
+
+### 7. KV Store Search - Apps & Collections to Search
 A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on. Each comma separated pair must use the format "<app-name>:<collection-name>".To see a list of available collections to search, set the "Search Type" to "KV Store Search", leave this field empty and click "Apply Changes".
 
-### 7. KV Store Search - Search Fields
+### 8. KV Store Search - Search Fields
 A comma separated list of KV Store Collection Fields to search on. To see a list of available fields to search on, leave this field empty and set option 6, `KV Store Search - Apps & Collections to Search` to your desired collections, then click "Apply Changes". 
 
 > ***Note:*** Minimizing these will improve KV Store search times.
 
 > ***Note:*** You can also use these fields in the "Summary Fields" option above.
 
-### 8. Index Discovery Search - Index Discovery Match Query
+### 9. Index Discovery Search - Index Discovery Match Query
 
 The Index Discovery Match Query allows you to override the default matching behavior when running the Index Discovery metasearch.
 

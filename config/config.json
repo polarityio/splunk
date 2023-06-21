@@ -137,7 +137,7 @@
     {
       "key": "searchAppQueryString",
       "name": "3. Custom SPL Search - Splunk Search App Query",
-      "description": "The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the \"Splunk Search String\" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10. If left blank the \"Splunk Search String\" option value will be used.",
+      "description": "The query to execute when opening the Splunk Search App from the Polarity Overlay Window.  In most cases this query will be the same as the \"Splunk Search String\" option.  The string `{{ENTITY}}` will be replaced by the looked up indicator. For example: index=logs value=TERM({{ENTITY}}) | head 10. If left blank the \"Splunk Search String\" option value will be used. Defaults to empty.",
       "default": "",
       "type": "text",
       "userCanEdit": false,
