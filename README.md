@@ -76,7 +76,7 @@ By default, the exact metasearch query run by the integration is as follows:
 | table index, sourcetype
 ```
 
-Note that this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. If you'd like to override this behavior you can modify the match query by modifying the `8. Index Discovery Search - Index Discovery Match Query` option.
+Note that this search uses the TERM directive to more efficiently search indexed terms.  As a result, it will not find non-indexed entities. If you'd like to override this behavior you can modify the match query by modifying the `9. Index Discovery Search - Index Discovery Match Query` option.
 
 For each returned index/sourcetype, the integration will provide a link that will take you to the Splunk search app with a pre-populated search for the entity in question.  The default pre-populated search app search has the form:
 
@@ -84,7 +84,7 @@ For each returned index/sourcetype, the integration will provide a link that wil
 index={{index}} sourcetype={{sourcetype}} TERM(8.8.8.8)
 ```
 
-If you provide a value for option `8. Index Discovery Search - Index Discovery Match Query`, then this match query will be used to create the search app link.
+If you provide a value for option `9. Index Discovery Search - Index Discovery Match Query`, then this match query will be used to create the search app link.
 
 The value of the `1. Earliest Time Bounds` option will be applied to the metasearch.
 
@@ -264,7 +264,7 @@ The maximum number of summary tags to display in the Overlay Window before showi
 A comma separated list of App and Collection pairs found in the KV Store you want to run your searches on. Each comma separated pair must use the format "<app-name>:<collection-name>".To see a list of available collections to search, set the "Search Type" to "KV Store Search", leave this field empty and click "Apply Changes".
 
 ### 8. KV Store Search - Search Fields
-A comma separated list of KV Store Collection Fields to search on. To see a list of available fields to search on, leave this field empty and set option 6, `KV Store Search - Apps & Collections to Search` to your desired collections, then click "Apply Changes". 
+A comma separated list of KV Store Collection Fields to search on. To see a list of available fields to search on, leave this field empty and set option 7, `KV Store Search - Apps & Collections to Search` to your desired collections, then click "Apply Changes". 
 
 > ***Note:*** Minimizing these will improve KV Store search times.
 
