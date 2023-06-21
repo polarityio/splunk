@@ -15,10 +15,12 @@ const {
   size
 } = require('lodash/fp');
 const { parseErrorToReadableJSON } = require('./errors');
+const { escapeQuotes } = require('./utils');
 
 const reduce = require('lodash/fp/reduce').convert({ cap: false });
 
 const EXPECTED_QUERY_STATUS_CODES = [200, 404];
+const DEFAULT_MATCH_QUERY = 'index=* TERM("{{ENTITY}}")';
 
 const buildMultiEntityMetaSearchTask = (
   entityGroup,
@@ -32,7 +34,8 @@ const buildMultiEntityMetaSearchTask = (
     uri: `${options.url}/services/search/jobs/export`,
     qs: {
       search: buildSearchString(entityGroup, options, Logger),
-      output_mode: 'json'
+      output_mode: 'json',
+      adhoc_search_level: 'fast'
     },
     json: false
   };
@@ -40,6 +43,8 @@ const buildMultiEntityMetaSearchTask = (
   if (options.earliestTimeBound.length > 0) {
     requestOptions.qs.earliest_time = options.earliestTimeBound;
   }
+
+  Logger.trace({requestOptions}, 'Metasearch Request Options');
 
   requestWithDefaults(
     requestOptions,
@@ -50,6 +55,7 @@ const buildMultiEntityMetaSearchTask = (
 
 const handleStandardQueryResponse =
   (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
+    Logger.trace({error, res, body}, 'Raw Metasearch Response');
     const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
       get('statusCode', res)
     );
@@ -93,14 +99,21 @@ const handleStandardQueryResponse =
     }
   };
 
-const createMetaSearch = (entityValue, options) => `    
-    | metasearch index=* TERM("${entityValue}") 
-    | dedup index, sourcetype    
-    | stats values(sourcetype) AS sourcetype by index    
-    | mvexpand sourcetype    
-    | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
-    | table index, sourcetype, entity
-`;
+const createMetaSearch = (entityValue, options) => {
+  if (options.indexDiscoveryMatchQuery.trim().length === 0) {
+    // Set the default match query if the user has removed it
+    options.indexDiscoveryMatchQuery = DEFAULT_MATCH_QUERY;
+  }
+
+  const matchQuery = options.indexDiscoveryMatchQuery.replace(/{{ENTITY}}/gi, entityValue);
+
+  return `| metasearch ${matchQuery}
+     | dedup index, sourcetype
+     | stats values(sourcetype) AS sourcetype by index
+     | mvexpand sourcetype
+     | eval entity="${entityValue}", index=index, sourcetype=sourcetype, searchUrl=""
+     | table index, sourcetype, entity`;
+};
 
 const buildSearchString = (entityGroup, options, Logger) => {
   const fullMultiEntitySearchString = reduce(
@@ -115,13 +128,6 @@ const buildSearchString = (entityGroup, options, Logger) => {
   Logger.trace({ fullMultiEntitySearchString }, 'Multi-entity meta search string');
   return fullMultiEntitySearchString;
 };
-
-/**
- * Used to escape double quotes in entities
- * @param entityValue
- * @returns {*}
- */
-const escapeQuotes = flow(get('value'), replace(/(\r\n|\n|\r)/gm, ''), replace(/"/g, ''));
 
 const buildQueryResultFromResponseStatus = (entityGroup, options, res, body, Logger) => {
   const statusSuccess = get('statusCode', res) === 200;

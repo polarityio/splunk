@@ -1,5 +1,6 @@
 const fp = require('lodash/fp');
 const reduce = require('lodash/fp/reduce').convert({ cap: false });
+const { getLogger } = require('./logger');
 
 const getAuthenticationOptionValidationErrors = (options) => {
   const stringOptionsErrorMessages = {
@@ -11,10 +12,10 @@ const getAuthenticationOptionValidationErrors = (options) => {
         }
       : {
           apiToken:
-            'You must provide a valid Splunk api token if both a username and password are provided.'
-        }),
-    searchString:
-      'You must provide a valid Splunk Search String. Without a Splunk Search String, no results will be returned'
+            'You must provide a valid Splunk api token if both a username and password are not provided.'
+        })
+    // searchString:
+    //   'You must provide a valid Splunk Search String. Without a Splunk Search String, no results will be returned'
   };
 
   // if both a username or password and a API Token is provided, show validation on all fields so
@@ -58,6 +59,20 @@ const getAuthenticationOptionValidationErrors = (options) => {
       {
         key: 'username',
         message: 'You must provide username for the given Splunk Password.'
+      }
+    ];
+  }
+
+  // If the searchType is "Custom SPL Query" then a "Splunk Search String" must be set
+  if (
+    options.searchType.value.value === 'spl' &&
+    options.searchString.value.trim().length === 0
+  ) {
+    return [
+      {
+        key: 'searchString',
+        message:
+          'You must provide a valid Splunk Search String when the "Search Type" is set to "Custom SPL Query"'
       }
     ];
   }
