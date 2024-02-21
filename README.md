@@ -121,7 +121,7 @@ search index=proxy srcIp=TERM({{ENTITY}}) | head 10
 
 This will ensure each returned row include an `entity` property with the value of the entity being searched.
 
-Custom SPL searches also support running `metasearch`, `tstats`, `inputlookup` and macros.
+Custom SPL searches also support running `metasearch`, `tstats`, `inputlookup`, `from`, and macros.
 
 #### metasearch
 
@@ -145,6 +145,14 @@ inputlookup example:
 
 ```
 | inputlookup kvstorecoll_lookup where (Port=443) AND (SourceIP="{{ENTITY}}") | head 10
+```
+
+#### from
+
+`from` example:
+
+```
+| from datamodel:internal_server.splunkdaccess | where clientip="{{ENTITY}}" | head 10
 ```
 
 #### When to use the TERM Directive
