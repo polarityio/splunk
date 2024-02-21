@@ -29,6 +29,7 @@ const VALID_SPL_COMMAND_REGEXES = [
   /\|\s*metasearch/i,
   /\|\s*tstats/i,
   /\|\s*inputlookup/i,
+  /\|\s*from/i,
   /\|\s*`/i //macros in Splunk are encapsulated in backticks
 ];
 
