@@ -220,8 +220,6 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
     };
   });
 
-  Logger.trace({ formattedBody, formattedBodyAsArray }, 'Formatted Body');
-
   const successResult =
     statusSuccess &&
     map((entity) => {
