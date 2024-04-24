@@ -17,7 +17,7 @@ const {
   size
 } = require('lodash/fp');
 const { getLogger } = require('./logger');
-const { escapeQuotes } = require('./utils');
+const { escapeQuotes, objectToArray } = require('./utils');
 const { parseErrorToReadableJSON } = require('./errors');
 
 const { searchKvStoreAndAddToResults } = require('./getKvStoreQueryResults');
@@ -212,14 +212,20 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
       uniqWith(isEqual)
     )(body);
 
-  Logger.trace({ formattedBody }, 'Formatted Body');
+  // To ensure that we preserve the order of fields when rendering them in the client, we convert
+  // the object to an array of objects containing `key`, `value` properties.
+  const formattedBodyAsArray = formattedBody.map((row) => {
+    return {
+      result: objectToArray(row.result)
+    };
+  });
 
   const successResult =
     statusSuccess &&
     map((entity) => {
       const bodyResultsForThisEntity = getObjectsContainingString(
         entity.value,
-        formattedBody
+        formattedBodyAsArray
       );
 
       const searchString = flow(get('searchString'), trim)(options);

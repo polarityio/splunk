@@ -21,7 +21,7 @@ const {
   find,
   __
 } = require('lodash/fp');
-
+const { objectToArray } = require('./utils');
 const async = require('async');
 
 const MAX_PARALLEL_LOOKUPS = 10;
@@ -71,11 +71,19 @@ const searchKvStoreAndAddToResults = (
       map((result) => ({ result }))
     )(results);
 
+    // To ensure that we preserve the order of fields when rendering them in the client, we convert
+    // the object to an array of objects containing `key`, `value` properties.
+    const kvStoreResultsAsArray = kvStoreResults.map((row) => {
+      return {
+        result: objectToArray(row.result)
+      };
+    });
+
     const kvStoreResultsByEntity = compact(
       map((entity) => {
         const kvStoreResultsForThisEntity = getObjectsContainingString(
           entity.value,
-          kvStoreResults
+          kvStoreResultsAsArray
         );
         return (
           size(kvStoreResultsForThisEntity) && {
