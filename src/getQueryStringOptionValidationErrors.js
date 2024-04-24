@@ -7,7 +7,7 @@ const getQueryStringOptionValidationErrors = async (options, doLookup) => {
   // Checking the Search String Option for Parsing Issues on User Option Splunk Auth Credentials
   return new Promise((res, rej) =>
     doLookup(
-      [{ value: '8.8.8.8', type: 'IPv4' }],
+      [{ value: '8.8.8.8', type: 'IPv4', types: ['IP', 'IPv4'] }],
       options,
       (error) =>
         res(
