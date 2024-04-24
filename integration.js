@@ -121,8 +121,8 @@ const doLookup = (entities, options, cb) => {
                 summary: [],
                 details: {
                   results: searchResponseBody,
-                  search: result.searchQuery,
-                  searchAppQuery: result.searchAppQuery,
+                  search: encodeURIComponent(result.searchQuery),
+                  searchAppQuery: encodeURIComponent(result.searchAppQuery),
                   searchType: result.searchType,
                   tags: _getSummaryTags(result.searchResponseBody, summaryFields, options)
                 }
