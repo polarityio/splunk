@@ -72,12 +72,8 @@ function startup(logger) {
   const startingRequestWithDefaults = request.defaults(defaults);
 
   requestWithDefaults = (requestOptions, options, callback) => {
-    return addAuthHeaders(requestOptions, options, (err, requestOptionsWithAuth) => {
-      Logger.trace({ requestOptionsWithAuth }, 'Request Options');
-      if (err) return callback({ ...err, isAuthError: true });
-
-      startingRequestWithDefaults(requestOptionsWithAuth, callback);
-    });
+    const requestOptionsWithAuth = addAuthHeaders(requestOptions, options);
+    startingRequestWithDefaults(requestOptionsWithAuth, callback);
   };
 }
 
@@ -189,7 +185,7 @@ function onMessage(payload, options, cb) {
 
         if (lookupResults.length > 0 && lookupResults[0].data !== null) {
           return cb(null, lookupResults[0].data.details);
-        } else if(lookupResults.length > 0 && lookupResults[0].data === null){
+        } else if (lookupResults.length > 0 && lookupResults[0].data === null) {
           //no results
           return cb(null, lookupResults[0].data);
         }

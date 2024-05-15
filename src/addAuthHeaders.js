@@ -1,9 +1,5 @@
-const addAuthHeaders = (
-  requestOptions,
-  options,
-  callback
-) => {
-  if (options.isCloud) {
+const addAuthHeaders = (requestOptions, options) => {
+  if (options.username && options.password) {
     requestOptions.auth = {
       username: options.username,
       password: options.password
@@ -11,7 +7,7 @@ const addAuthHeaders = (
   } else {
     requestOptions.headers = { Authorization: 'Bearer ' + options.apiToken };
   }
-  callback(null, requestOptions);
+  return requestOptions;
 };
 
 module.exports = addAuthHeaders;
