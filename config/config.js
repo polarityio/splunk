@@ -5,7 +5,7 @@ module.exports = {
    * @type String
    * @required
    */
-  name: 'Splunk',
+  name: 'Splunk SPL',
   /**
    * The acronym that appears in the notification window when information from this integration
    * is displayed.  Note that the acronym is included as part of each "tag" in the summary information
@@ -25,12 +25,12 @@ module.exports = {
   description:
     'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
   entityTypes: ['IPv4', 'IPv6', 'hash', 'email', 'domain'],
-  // customTypes: [
-  //   {
-  //     key: 'splunkSearch',
-  //     regex: /^search [\s\S]{2,512}$/
-  //   }
-  // ],
+  customTypes: [
+    {
+      key: 'splunkSearch',
+      regex: /^search [\s\S]{2,512}$/
+    }
+  ],
   /**
    * Uncomment the below line when enabled the custom `splunkSearch` entity type to ensure the integration
    * only runs in onDemand mode.
