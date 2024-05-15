@@ -1,5 +1,5 @@
 {
-  "main": "./integrations.js",
+  "main": "./integration.js",
   "name": "SplunkSPL",
   "version": "3.2.1",
   "private": true,
