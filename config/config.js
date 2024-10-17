@@ -24,7 +24,7 @@ module.exports = {
    */
   description:
     'Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.',
-  entityTypes: ['IPv4', 'IPv6', 'hash', 'email', 'domain', 'cve'],
+  entityTypes: ['IPv4', 'IPv6', 'MD5', 'SHA1', 'SHA256', 'email', 'domain', 'cve'],
   defaultColor: 'light-gray',
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
@@ -73,7 +73,7 @@ module.exports = {
     ca: '',
     // An HTTP proxy to be used. Supports proxy Auth with Basic Auth, identical to support for
     // the url parameter (by embedding the auth info in the uri)
-    proxy: ""
+    proxy: ''
   },
   logging: {
     level: 'info' //trace, debug, info, warn, error, fatal
@@ -222,7 +222,7 @@ module.exports = {
       key: 'maxSummaryTags',
       name: '6. Custom SPL/KV Store Search - Maximum Number of Summary Tags Displayed',
       description:
-          'The maximum number of summary tags to display in the Overlay Window before showing a count.  If set to 0, all tags will be shown.',
+        'The maximum number of summary tags to display in the Overlay Window before showing a count.  If set to 0, all tags will be shown.',
       default: 4,
       type: 'number',
       userCanEdit: false,
