@@ -3,9 +3,35 @@
   "name": "Splunk",
   "acronym": "SPLNK",
   "description": "Splunk allows you to aggregate, analyze and get answers from your machine data with the help of machine learning and real-time visibility.",
-  "entityTypes": ["IPv4", "IPv6", "MD5", "SHA1", "SHA256", "email", "domain", "cve"],
+  "entityTypes": [
+    "IPv6",
+    "IPv4",
+    "MD5",
+    "SHA1",
+    "SHA256",
+    "email",
+    "domain",
+    "cve"
+  ],
+  "dataTypes": [
+    "IPv4",
+    "IPv6",
+    "MD5",
+    "SHA1",
+    "SHA256",
+    "email",
+    "domain",
+    "cve",
+    {
+      "type": "string",
+      "enabled": false
+    }
+  ],
+  "supportsAdditionalCustomTypes": true,
   "defaultColor": "light-gray",
-  "styles": ["./styles/se.less"],
+  "styles": [
+    "./styles/se.less"
+  ],
   "block": {
     "component": {
       "file": "./components/se-block.js"
