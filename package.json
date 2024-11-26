@@ -1,11 +1,11 @@
 {
   "name": "Splunk",
-  "version": "3.6.5",
+  "version": "3.6.6",
   "main": "./integration.js",
   "description": "Splunk Query Engine",
   "private": true,
   "dependencies": {
-    "async": "^3.2.5",
+    "async": "^3.2.6",
     "lodash": "^4.17.21",
     "node-cache": "^5.1.2",
     "postman-request": "^2.88.1-postman.40"

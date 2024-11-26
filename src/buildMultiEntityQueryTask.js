@@ -275,9 +275,9 @@ const getObjectsContainingString = (string, objs) =>
   filter(
     flow(
       JSON.stringify,
-      replace(/[^\w]/g, ''),
+      replace(/[\s\-?'";:,.|!#$%^&*()~`<>{}\[\]\\]/g, ''),
       toLower,
-      includes(flow(replace(/[^\w]/g, ''), toLower)(string))
+      includes(flow(replace(/[\s\-?'";:,.|!#$%^&*()~`<>{}\[\]\\]/g, ''), toLower)(string))
     ),
     objs
   );
