@@ -21,11 +21,7 @@
     "SHA256",
     "email",
     "domain",
-    "cve",
-    {
-      "type": "string",
-      "enabled": false
-    }
+    "cve"
   ],
   "supportsAdditionalCustomTypes": true,
   "defaultColor": "light-gray",
