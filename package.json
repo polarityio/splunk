@@ -1,6 +1,6 @@
 {
   "name": "Splunk",
-  "version": "3.6.6",
+  "version": "3.6.7",
   "main": "./integration.js",
   "description": "Splunk Query Engine",
   "private": true,
