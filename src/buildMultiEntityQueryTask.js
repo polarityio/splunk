@@ -23,7 +23,7 @@ const { parseErrorToReadableJSON } = require('./errors');
 const { searchKvStoreAndAddToResults } = require('./getKvStoreQueryResults');
 const { buildMultiEntityMetaSearchTask } = require('./buildMultiEntityMetaSearchTask');
 
-const EXPECTED_QUERY_STATUS_CODES = [200, 404];
+const EXPECTED_QUERY_STATUS_CODES = [200];
 const VALID_SPL_COMMAND_REGEXES = [
   /search/i,
   /\|\s*metasearch/i,
