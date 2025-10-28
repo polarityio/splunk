@@ -56,9 +56,9 @@ const buildMultiEntityQueryTask =
       );
     } else {
       let requestOptions = {
-        method: 'GET',
-        uri: `${options.url}/services/search/jobs/export`,
-        qs: {
+        method: 'POST',
+        uri: `${options.url}/services/search/v2/jobs/export`,
+        form: {
           search: buildSearchString(entityGroup, options, Logger),
           output_mode: 'json'
         },
@@ -66,7 +66,7 @@ const buildMultiEntityQueryTask =
       };
 
       if (options.earliestTimeBound.length > 0) {
-        requestOptions.qs.earliest_time = options.earliestTimeBound;
+        requestOptions.form.earliest_time = options.earliestTimeBound;
       }
 
       Logger.trace({ requestOptions }, 'Custom SPL Search Request Options');
@@ -88,15 +88,17 @@ const buildMultiEntityQueryTask =
 const handleStandardQueryResponse =
   (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
     Logger.trace(
-      { body, statusCode: res ? res.statusCode : 'N/A' },
+      { body, statusCode: res ? res.statusCode : 'N/A', responseHeader: res ? res.headers : 'N/A' },
       'Raw Query Response'
     );
+    
     const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
       get('statusCode', res)
     );
 
     const err =
       error && JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    
     if (err || responseHadUnexpectedStatusCode) {
       const formattedError = get('isAuthError', err)
         ? {
@@ -199,6 +201,8 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
   const Logger = getLogger();
   const statusSuccess = get('statusCode', res) === 200;
 
+  Logger.info({ statusSuccess }, 'buildQueryResultFromResponseStatus');
+
   // Splunk returns newline delimited JSON objects.  As a result we need to
   // custom parse the data.  We replace newlines with commas and then wrap the
   // text in an array so the end result is an array of result objects.
@@ -248,7 +252,7 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
         searchStringWithoutPrefix
       )}`;
 
-      const searchAppQuery = `search ${replace(
+      const searchAppQuery = `${replace(
         /{{ENTITY}}/gi,
         escapeQuotes(entity),
         searchAppQueryStringWithoutPrefix

@@ -30,9 +30,9 @@ const buildMultiEntityMetaSearchTask = (
   done
 ) => {
   let requestOptions = {
-    method: 'GET',
-    uri: `${options.url}/services/search/jobs/export`,
-    qs: {
+    method: 'POST',
+    uri: `${options.url}/services/search/v2/jobs/export`,
+    form: {
       search: buildSearchString(entityGroup, options, Logger),
       output_mode: 'json',
       adhoc_search_level: 'fast'
@@ -41,7 +41,7 @@ const buildMultiEntityMetaSearchTask = (
   };
 
   if (options.earliestTimeBound.length > 0) {
-    requestOptions.qs.earliest_time = options.earliestTimeBound;
+    requestOptions.form.earliest_time = options.earliestTimeBound;
   }
 
   Logger.trace({requestOptions}, 'Metasearch Request Options');
