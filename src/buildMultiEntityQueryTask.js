@@ -26,12 +26,23 @@ const { buildMultiEntityMetaSearchTask } = require('./buildMultiEntityMetaSearch
 const EXPECTED_QUERY_STATUS_CODES = [200];
 const VALID_SPL_COMMAND_REGEXES = [
   /search/i,
-  /\|\s*metasearch/i,
-  /\|\s*tstats/i,
-  /\|\s*inputlookup/i,
+  /\|\s*datamodel/i,
+  /\|\s*dbinspect/i,
   /\|\s*from/i,
+  /\|\s*gentimes/i,
+  /\|\s*history/i,
+  /\|\s*inputlookup/i,
+  /\|\s*loadjob/i,
   /\|\s*makeresults/i,
-  /\|\s*eval/i,
+  /\|\s*mcatalog/i,
+  /\|\s*mcollect/i,
+  /\|\s*metadata/i,
+  /\|\s*metasearch/i,
+  /\|\s*pivot/i,
+  /\|\s*rest/i,
+  /\|\s*savedsearch/i,
+  /\|\s*search/i,
+  /\|\s*tstats/i,
   /\|\s*`/i //macros in Splunk are encapsulated in backticks
 ];
 
