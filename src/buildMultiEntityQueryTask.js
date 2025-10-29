@@ -30,6 +30,8 @@ const VALID_SPL_COMMAND_REGEXES = [
   /\|\s*tstats/i,
   /\|\s*inputlookup/i,
   /\|\s*from/i,
+  /\|\s*makeresults/i,
+  /\|\s*eval/i,
   /\|\s*`/i //macros in Splunk are encapsulated in backticks
 ];
 
@@ -88,17 +90,21 @@ const buildMultiEntityQueryTask =
 const handleStandardQueryResponse =
   (entityGroup, options, requestWithDefaults, done, Logger) => (error, res, body) => {
     Logger.trace(
-      { body, statusCode: res ? res.statusCode : 'N/A', responseHeader: res ? res.headers : 'N/A' },
+      {
+        body,
+        statusCode: res ? res.statusCode : 'N/A',
+        responseHeader: res ? res.headers : 'N/A'
+      },
       'Raw Query Response'
     );
-    
+
     const responseHadUnexpectedStatusCode = !EXPECTED_QUERY_STATUS_CODES.includes(
       get('statusCode', res)
     );
 
     const err =
       error && JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
-    
+
     if (err || responseHadUnexpectedStatusCode) {
       const formattedError = get('isAuthError', err)
         ? {
@@ -233,7 +239,10 @@ const buildQueryResultFromResponseStatus = (entityGroup, options, res, body) => 
       );
 
       const searchString = flow(get('searchString'), trim)(options);
-      const searchAppQueryString = flow(get('searchAppQueryString'), trim)(options);
+      let searchAppQueryString = flow(get('searchAppQueryString'), trim)(options);
+      if (searchAppQueryString.length === 0) {
+        searchAppQueryString = searchString;
+      }
 
       const searchStringWithoutPrefix = flow(toLower, startsWith('search'))(searchString)
         ? flow(replace(/search/i, ''), trim)(searchString)
