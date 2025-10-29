@@ -1,10 +1,7 @@
 'use strict';
 
 const request = require('postman-request');
-const config = require('./config/config');
 const async = require('async');
-const fs = require('fs');
-const NodeCache = require('node-cache');
 const { size, get, flow, reduce, keys, chunk, flatten, map } = require('lodash/fp');
 
 const getAuthenticationOptionValidationErrors = require('./src/getAuthenticationOptionValidationErrors');
@@ -14,9 +11,6 @@ const buildMultiEntityQueryTask = require('./src/buildMultiEntityQueryTask');
 const addAuthHeaders = require('./src/addAuthHeaders');
 const { setLogger } = require('./src/logger');
 
-const tokenCache = new NodeCache({
-  stdTTL: 5 * 60
-});
 
 let Logger;
 let requestWithDefaults;
@@ -33,33 +27,6 @@ function startup(logger) {
   let defaults = {};
   Logger = logger;
   setLogger(Logger);
-
-  if (typeof config.request.cert === 'string' && config.request.cert.length > 0) {
-    defaults.cert = fs.readFileSync(config.request.cert);
-  }
-
-  if (typeof config.request.key === 'string' && config.request.key.length > 0) {
-    defaults.key = fs.readFileSync(config.request.key);
-  }
-
-  if (
-    typeof config.request.passphrase === 'string' &&
-    config.request.passphrase.length > 0
-  ) {
-    defaults.passphrase = config.request.passphrase;
-  }
-
-  if (typeof config.request.ca === 'string' && config.request.ca.length > 0) {
-    defaults.ca = fs.readFileSync(config.request.ca);
-  }
-
-  if (typeof config.request.proxy === 'string' && config.request.proxy.length > 0) {
-    defaults.proxy = config.request.proxy;
-  }
-
-  if (typeof config.request.rejectUnauthorized === 'boolean') {
-    defaults.rejectUnauthorized = config.request.rejectUnauthorized;
-  }
 
   const startingRequestWithDefaults = request.defaults(defaults);
 
@@ -189,5 +156,5 @@ const validateOptions = async (options, callback) => {
 module.exports = {
   doLookup,
   startup,
-  validateOptions
+  //validateOptions
 };

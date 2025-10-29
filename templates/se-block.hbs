@@ -14,11 +14,11 @@
           </div>
           <div>
             {{#if block.userOptions.earliestTimeBound}}
-              <a href="{{block.userOptions.searchAppUrl}}?earliest={{block.userOptions.earliestTimeBound}}&q=search index=%22{{item.result.index}}%22 sourcetype=%22{{item.result.sourcetype}}%22 TERM({{block.entity.value}})" title="View events in Splunk">
+              <a href="{{block.userOptions.searchAppUrl}}?earliest={{block.userOptions.earliestTimeBound}}&q=index=%22{{item.result.index}}%22 sourcetype=%22{{item.result.sourcetype}}%22 TERM({{block.entity.value}})" title="View events in Splunk">
               View {{fa-icon "external-link" fixedWidth=true class="external-icon"}}
               </a>
             {{else}}
-              <a href="{{block.userOptions.searchAppUrl}}?q=search index=%22{{item.result.index}}%22 sourcetype=%22{{item.result.sourcetype}}%22 TERM({{block.entity.value}})" title="View events in Splunk">
+              <a href="{{block.userOptions.searchAppUrl}}?q=index=%22{{item.result.index}}%22 sourcetype=%22{{item.result.sourcetype}}%22 TERM({{block.entity.value}})" title="View events in Splunk">
                 View {{fa-icon "external-link" fixedWidth=true class="external-icon"}}
               </a>
             {{/if}}
