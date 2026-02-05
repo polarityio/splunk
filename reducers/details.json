@@ -1,0 +1,32 @@
+{
+  "root": {
+    "path": "",
+    "on_null": "return_empty"
+  },
+  "pipeline": [
+    {
+      "op": "copy",
+      "from": "results",
+      "to": "reduced_results.results_array"
+    },
+    {
+      "op": "copy",
+      "from": "tags[]",
+      "to": "reduced_results.summary_tags"
+    },
+    {
+      "op": "transform",
+      "path": "reduced_results.results_count",
+      "function": "count",
+      "source": "results"
+    },
+    {
+      "op": "prune",
+      "strategy": "empty_values",
+      "target": "reduced_results"
+    }
+  ],
+  "output": {
+    "result": "$working.reduced_results"
+  }
+}

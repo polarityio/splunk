@@ -1,0 +1,111 @@
+{
+  "results": [
+    {
+      "result": {
+        "index": "main",
+        "sourcetype": "access_combined",
+        "source": "/var/log/apache/access.log",
+        "_time": "2024-01-15T10:23:45.000-05:00",
+        "clientip": "192.168.1.100",
+        "method": "GET",
+        "uri": "/api/search",
+        "status": "200",
+        "bytes": "2456",
+        "useragent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "referer": "https://example.com/home",
+        "_serial": "0",
+        "_si": ["splunk-server", "main"]
+      }
+    },
+    {
+      "result": {
+        "index": "main",
+        "sourcetype": "linux_secure",
+        "source": "/var/log/secure",
+        "_time": "2024-01-15T10:24:12.000-05:00",
+        "action": "accepted",
+        "src_ip": "10.0.0.15",
+        "user": "admin",
+        "authentication_method": "publickey",
+        "session_id": "12345",
+        "_serial": "1",
+        "_si": ["splunk-server", "main"]
+      }
+    },
+    {
+      "result": {
+        "index": "security",
+        "sourcetype": "firewall",
+        "source": "paloalto:firewall",
+        "_time": "2024-01-15T10:25:33.000-05:00",
+        "action": "deny",
+        "src_ip": "203.0.113.42",
+        "dest_ip": "192.168.1.50",
+        "src_port": "54321",
+        "dest_port": "445",
+        "protocol": "tcp",
+        "threat_name": "SMB Exploit Attempt",
+        "severity": "critical",
+        "_serial": "2",
+        "_si": ["splunk-server", "security"]
+      }
+    },
+    {
+      "result": {
+        "index": "web",
+        "sourcetype": "nginx:plus:access",
+        "source": "/var/log/nginx/access.log",
+        "_time": "2024-01-15T10:26:01.000-05:00",
+        "request_time": "0.234",
+        "upstream_response_time": "0.198",
+        "status": "404",
+        "request": "GET /missing/page HTTP/1.1",
+        "clientip": "198.51.100.77",
+        "_serial": "3",
+        "_si": ["splunk-server", "web"]
+      }
+    },
+    {
+      "result": {
+        "index": "windows",
+        "sourcetype": "WinEventLog:Security",
+        "source": "WinEventLog:Security",
+        "_time": "2024-01-15T10:27:15.000-05:00",
+        "EventCode": "4625",
+        "Account_Name": "administrator",
+        "Source_Network_Address": "192.168.1.200",
+        "Failure_Reason": "Unknown user name or bad password",
+        "Logon_Type": "3",
+        "_serial": "4",
+        "_si": ["splunk-server", "windows"]
+      }
+    }
+  ],
+  "search": "search%20index%3Dmain%20%22192.168.1.100%22%20%7C%20head%2010",
+  "searchAppQuery": "index%3Dmain%20%22192.168.1.100%22%20%7C%20head%2010",
+  "searchType": "search",
+  "tags": [
+    {
+      "field": "_si",
+      "value": "splunk-server, main"
+    },
+    {
+      "field": "_serial",
+      "value": "0"
+    },
+    {
+      "field": "status",
+      "value": "200"
+    },
+    {
+      "field": "action",
+      "value": "accepted"
+    }
+  ],
+  "extraDebugField": "This should be filtered out",
+  "internalMetadata": {
+    "queryId": "12345-abcde",
+    "executionTime": 0.523,
+    "cacheHit": false
+  }
+}
